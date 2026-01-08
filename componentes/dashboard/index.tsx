@@ -6,13 +6,30 @@ import CardAcoes from "../ui/CardAcoes";
 import { BookOpen, Heart, Repeat, Target } from "lucide-react";
 import Cabecalho from "../ui/Cabecalho";
 import ContainerPages from "../ui/ContainerPages";
+import { useEffect, useState } from "react";
+import { getLoggedUser } from "@/componentes/services/APIservices";
 
 export default function Dashboard() {
+    const [nome, setNome] = useState("");
+    
+   useEffect(() => {
+    async function fetchUser() {
+      try {
+        const user = await getLoggedUser();
+        setNome(user.name);
+      } catch (err) {
+        console.error("Erro ao buscar usuário", err);
+      }
+    }
+
+    fetchUser();
+  }, []);
+
   return (
     <>
       <ContainerPages>
         <Cabecalho
-          title="Olá! Bem-vinda de volta! 🌸"
+          title={`Olá! ${nome}!  Bem-vinda de volta! 🌸`}
           imageSrc={"/images/hello-kitty-dashboard.jpg"}
         >
           <DateComponent />
