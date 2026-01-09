@@ -12,18 +12,20 @@ import { getLoggedUser } from "@/componentes/services/APIservices";
 export default function Dashboard() {
    const [userName, setUserName] = useState<string>("");
 
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const user = await getLoggedUser();
-        setUserName(user.name); // salva o nome do usuário no state
-      } catch (err) {
-        console.error("Erro ao buscar usuário logado", err);
+useEffect(() => {
+  async function fetchUser() {
+    try {
+      const user = await getLoggedUser();
+      console.log("Dados do usuário recebidos:", user); // Adicione isso aqui
+      if (user && user.name) {
+        setUserName(user.name);
       }
+    } catch (err) {
+      console.error("Erro ao buscar usuário logado", err);
     }
-
-    fetchUser();
-  }, []);
+  }
+  fetchUser();
+}, []);
 
   return (
     <>
