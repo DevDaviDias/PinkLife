@@ -10,15 +10,15 @@ import { useEffect, useState } from "react";
 import { getLoggedUser } from "@/componentes/services/APIservices";
 
 export default function Dashboard() {
-    const [nome, setNome] = useState("");
-    
-   useEffect(() => {
+   const [userName, setUserName] = useState<string>("");
+
+  useEffect(() => {
     async function fetchUser() {
       try {
         const user = await getLoggedUser();
-        setNome(user.name);
+        setUserName(user.name); // salva o nome do usuário no state
       } catch (err) {
-        console.error("Erro ao buscar usuário", err);
+        console.error("Erro ao buscar usuário logado", err);
       }
     }
 
@@ -28,10 +28,10 @@ export default function Dashboard() {
   return (
     <>
       <ContainerPages>
-        <Cabecalho
-          title={`Olá! ${nome}!  Bem-vinda de volta! 🌸`}
-          imageSrc={"/images/hello-kitty-dashboard.jpg"}
-        >
+         <Cabecalho
+        title={`Olá, ${userName || "Bem-vinda"}! 🌸`}
+        imageSrc={"/images/hello-kitty-dashboard.jpg"}
+      >
           <DateComponent />
         </Cabecalho>
 

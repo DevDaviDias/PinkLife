@@ -18,6 +18,7 @@ export async function registerUser(name: string, email: string, password: string
   });
   return response.data; // retorna { msg }
 }
+
 export async function getLoggedUser() {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("Usuário não está logado");
