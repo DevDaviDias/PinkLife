@@ -1,10 +1,12 @@
 import DateComponent from "../ui/date";
 import Image from "next/image";
+import TitleSection from "@/componentes/ui/TitleSection"; 
 
 export default function Dashboard() {
   return (
   <div>
-    <h2>Olá! Bem vindo de volta!🌸</h2>
+
+    <TitleSection title="Olá! Bem-vinda de volta!" />
     <DateComponent />
     <Image
       src="/images/hello-kitty-dashboard.jpg"
