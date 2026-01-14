@@ -1,8 +1,11 @@
 import Button from "@/componentes/ui/Button";
 import { Icon } from "lucide-react";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 
-export default function Menuhamburguer() {
+
+export default function MenuHamburguer({ onChangeSessao }: { onChangeSessao: (sessao: string) => void }) {
+
   return (
     <div className="flex flex-col gap-10 w-[15em] p-4 bg-white h-full border-r-2 border-pink-300">
       <div>
@@ -19,31 +22,31 @@ export default function Menuhamburguer() {
       <div className="gap-8">
         <ul>
           <li>
-            <Button label="Dashboard" />
+            <Button label="dashboard" onClick={() => onChangeSessao("dashboard")} />
+          </li>             
+          <li>
+            <Button label="Estudos" onClick={() => onChangeSessao("estudos")} />
           </li>
           <li>
-            <Button label="Estudos" />
+            <Button label="Treino" onClick={() => onChangeSessao("treino")} />
           </li>
           <li>
-            <Button label="Treino" />
+            <Button label="Hábitos" onClick={() => onChangeSessao("habitos")} />
           </li>
           <li>
-            <Button label="Hábitos" />
+            <Button label="Finanças" onClick={() => onChangeSessao("financas")} />
           </li>
           <li>
-            <Button label="Finanças" />
+            <Button label="Beleza" onClick={() => onChangeSessao("beleza")} />
           </li>
           <li>
-            <Button label="Beleza" />
+            <Button label="Casa & Rotina" onClick={() => onChangeSessao("casa_rotina")} />
           </li>
           <li>
-            <Button label="Casa & Rotina" />
+            <Button label="Saúde" onClick={() => onChangeSessao("saude")} />
           </li>
           <li>
-            <Button label="Saúde" />
-          </li>
-          <li>
-            <Button label="Alimentação" />
+            <Button label="Alimentação" onClick={() => onChangeSessao("alimentacao")} />
           </li>
         </ul>
       </div>

@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export default function Desenvolvimento({}) {
+export default function Desenvolvimento() {
   return (
     <div className="flex flex-col gap-4 ml-[17em] mt-8 text-center items-center justify-center">
         <Image src="/images/hello-kitty-dashboard_variant_1.jpg" alt="Logo" width={50} height={50} className="animate-bounce rounded-[50%]"/>
