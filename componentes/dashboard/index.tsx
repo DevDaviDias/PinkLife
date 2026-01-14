@@ -2,6 +2,8 @@ import DateComponent from "../ui/date";
 import Image from "next/image";
 import TitleSection from "@/componentes/ui/Title";
 import Cardprogresso from "../ui/Cardprogresso";
+import StatusCard from "../ui/StatusCard";
+import CardAcoes from "../ui/CardAcoes";
 
 export default function Dashboard() {
   return (
@@ -30,6 +32,16 @@ export default function Dashboard() {
       <Cardprogresso title="Estudos" progressoDodia="3.5h" progresso={70} barraDeProgresso={true} />
      
       <Cardprogresso title="Treino" progressoDodia="Concluido" progresso={100} barraDeProgresso={true} />
+     </div>
+
+     <div className="flex gap-4 mt-[2em]">
+      <StatusCard title="Agenda de Hoje" progressoDodia="Progresso do dia"  ></StatusCard>
+      <StatusCard title="Conquistas da Semana" progressoDodia="Progresso do dia"  ></StatusCard>
+     </div>
+
+     <div>
+    <CardAcoes title="Ações Rápidas" progressoDodia="Progresso do dia"  ></CardAcoes>
+    
      </div>
 
 
