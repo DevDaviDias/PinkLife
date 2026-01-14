@@ -49,3 +49,10 @@ body {
     padding: 0;
     box-sizing: border-box;
 }
+html, body, #__next {
+    height: 100%;
+    width: 100%;
+    font-family: 'Geist Sans', sans-serif;
+    background-color: var(--color-bg-main);
+    color: var(--color-text-primary);
+}

@@ -8,7 +8,7 @@ type PropsProgresso = {
 
 export default function Cardprogresso({ title,progressoDodia, progresso, barraDeProgresso }: PropsProgresso) {
     return (
-        <div className="bg-white p-4 rounded-lg shadow-md w-70 border-2 border-pink-200 h-24">
+        <div className="bg-white p-4 rounded-lg shadow-md w-[21.5em] border-2 border-pink-200 h-24">
             <h2 className="text-pink-400 text-lg font-bold">{title}</h2>
             <p text-lg>{progressoDodia}</p>
             {barraDeProgresso && (

@@ -5,7 +5,7 @@ import Cardprogresso from "../ui/Cardprogresso";
 
 export default function Dashboard() {
   return (
-    <div className="m-2">
+    <div className="m-2 ml-[17em]">
       <div className="flex flex-start items-center justify-between">
         <div>
           <TitleSection title="Olá! Bem-vinda de volta! 🌸" />
@@ -27,9 +27,9 @@ export default function Dashboard() {
      
       <Cardprogresso title="Tarefas" progressoDodia="Progresso do dia" progresso={70} barraDeProgresso={true} />
      
-      <Cardprogresso title="Estudos" progressoDodia="Progresso do dia" progresso={70} barraDeProgresso={true} />
+      <Cardprogresso title="Estudos" progressoDodia="3.5h" progresso={70} barraDeProgresso={true} />
      
-      <Cardprogresso title="Treino" progressoDodia="Progresso do dia" progresso={70} barraDeProgresso={true} />
+      <Cardprogresso title="Treino" progressoDodia="Concluido" progresso={100} barraDeProgresso={true} />
      </div>
 
 
