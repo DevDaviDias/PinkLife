@@ -1,5 +1,6 @@
 import Dashboard from "@/componentes/dashboard";
 import Menuhamburguer from "@/componentes/Menuhamburguer";
+import Desenvolvimento from "@/componentes/Desenvolvimento";
 
 export default function Home() {
   return (
@@ -8,6 +9,7 @@ export default function Home() {
     <Menuhamburguer />
     </div>
       <Dashboard />
+      <Desenvolvimento />
       
     </>
   );

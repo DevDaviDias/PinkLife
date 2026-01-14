@@ -1,17 +1,25 @@
 import Button from "@/componentes/ui/Button";
 import { Icon } from "lucide-react";
+import Image from "next/image";
 
 export default function Menuhamburguer() {
   return (
     <div className="flex flex-col gap-10 w-[15em] p-4 bg-white h-full border-r-2 border-pink-300">
-      <div >
-        <h2 className="text-pink-400 text-2xl font-bold" >hello kitty</h2>
-        <p>Organizador pessoal</p>
+      <div>
+        <div className="flex">
+          
+         <Image src="/images/hello-kitty-logo.png" alt="Logo" width={50} height={50} />
+          <div className="flex-col">
+          <h2 className="text-pink-400 text-2xl  font-bold">hello kitty</h2> 
+          <p className="text-sm">Organizador pessoal</p>
+          </div>
+        </div>
+       
       </div>
       <div className="gap-8">
-        <ul >
+        <ul>
           <li>
-            <Button label="Dashboard"   />
+            <Button label="Dashboard" />
           </li>
           <li>
             <Button label="Estudos" />
@@ -40,7 +48,10 @@ export default function Menuhamburguer() {
         </ul>
       </div>
       <div className="bg-linear-to-r from-pink-300   to-pink-400 text-center p-2 rounded-md ">
-        <p className="text-white text-[0.9em] "> `Você pode fazer qualquer coisa que quiser!`</p>
+        <p className="text-white text-[0.9em] ">
+          {" "}
+          `Você pode fazer qualquer coisa que quiser!`
+        </p>
         <p className="text-white [0.9em]"> - Hello Kitty 💕</p>
       </div>
     </div>
