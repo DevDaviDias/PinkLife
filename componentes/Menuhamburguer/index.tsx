@@ -1,9 +1,6 @@
-import Home from "@/app/page";
 import Button from "@/componentes/ui/Button";
 import { BookOpen, DollarSign, Dumbbell, Heart, Icon, LayoutDashboard, Plane, Repeat, Sparkles, Target, Utensils, House   } from "lucide-react";
 import Image from "next/image";
-import { useState, useEffect } from "react";
-
 
 export default function MenuHamburguer({ onChangeSessao }: { onChangeSessao: (sessao: string) => void }) {
 
@@ -41,7 +38,10 @@ export default function MenuHamburguer({ onChangeSessao }: { onChangeSessao: (se
             <Button label="Beleza" onClick={() => onChangeSessao("beleza")} icon={<Sparkles size={17}/>} />
           </li>
           <li>
-            <Button label="Casa & Rotina" onClick={() => onChangeSessao("casa_rotina")} icon={<Plane size={17}/>} />
+            <Button label="Viagens" onClick={() => onChangeSessao("viagens")} icon={<Plane size={17}/>} />
+          </li>
+           <li>
+            <Button label="Casa & Rotina" onClick={() => onChangeSessao("casa_rotina")} icon={<House size={17}/>} />
           </li>
           <li>
             <Button label="Saúde" onClick={() => onChangeSessao("saude")} icon={<Heart size={17}/>} />

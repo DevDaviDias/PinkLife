@@ -2,14 +2,19 @@ import ContainerPages from "../ui/ContainerPages";
 import Cabecalho from "../ui/Cabecalho";
 import Desenvolvimento from "../Desenvolvimento";
 
-export default function Saude() {
+export default function Viagens() {
   return (
     <>
       <ContainerPages>
-        <Cabecalho title="Saúde 🩺" imageSrc={"/images/hello-kitty-health.jpg"}>
-          <p className="">Organize sua rotina de saúde e bem-estar</p>
+       <Cabecalho
+          title="Viagens 🧳"
+          imageSrc={"/images/hello-kitty-travel.jpg"}
+        >
+          <p className="">Planeje suas viagens e organize sua rotina</p>
         </Cabecalho>
+
         <Desenvolvimento />
+
       </ContainerPages>
     </>
   );

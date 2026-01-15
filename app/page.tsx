@@ -1,9 +1,18 @@
 "use client";
+import { useState } from "react";
 import Dashboard from "@/componentes/dashboard";
 import Menuhamburguer from "@/componentes/Menuhamburguer";
-import Desenvolvimento from "@/componentes/Desenvolvimento";
+
 import Estudos from "@/componentes/Estudos";
-import { useState } from "react";
+import Saude from "@/componentes/Saude";
+import Viagens from "@/componentes/Viagens";
+import CasaERotina from "@/componentes/CasaERotina";
+import Alimentacao from "@/componentes/Alimentacao";
+import Treino from "@/componentes/Treino";
+import Habitos from "@/componentes/Habitos";
+import Financas from "@/componentes/Financas";
+import Beleza from "@/componentes/Beleza";
+
 
 export default function Home() {
   const [sessao, setSessao] = useState("dashboard");
@@ -18,13 +27,14 @@ export default function Home() {
       </div>
       {sessao === "dashboard" && <Dashboard />}
       {sessao === "estudos" && <Estudos />}
-      {sessao === "treino" && <Desenvolvimento />}
-      {sessao === "habitos" && <Desenvolvimento />}
-      {sessao === "financas" && <Desenvolvimento />}
-      {sessao === "beleza" && <Desenvolvimento />}
-      {sessao === "casa_rotina" && <Desenvolvimento />}
-      {sessao === "saude" && <Desenvolvimento />}
-      {sessao === "alimentacao" && <Desenvolvimento />}
+      {sessao === "treino" && <Treino />}
+      {sessao === "habitos" && <Habitos />}
+      {sessao === "financas" && <Financas />}
+      {sessao === "beleza" && <Beleza/>}
+      {sessao === "casa_rotina" && <CasaERotina />}
+      {sessao === "saude" && <Saude/>}
+      {sessao === "viagens" && <Viagens />}
+      {sessao === "alimentacao" && <Alimentacao />}
     </>
   );
 }

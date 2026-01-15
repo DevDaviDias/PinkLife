@@ -1,18 +1,19 @@
 import ContainerPages from "../ui/ContainerPages";
 import Cabecalho from "../ui/Cabecalho";
+import Desenvolvimento from "../Desenvolvimento";
 
-export default function Estudos() {
+export default function Beleza() {
   return (
     <>
       <ContainerPages>
        <Cabecalho
-          title="Seção de Estudos 📚"
-          imageSrc={"/images/hello-kitty-study.jpg"}
+          title="Beleza 💄"
+          imageSrc={"/images/hello-kitty-beauty.jpg"}
         >
-          <p className="">Organize seus estudos e acompanhe o progresso</p>
+          <p className="">Organize sua rotina de beleza e bem-estar</p>
         </Cabecalho>
-
-      </ContainerPages>
+        <Desenvolvimento /> 
+        </ContainerPages>
     </>
   );
 }
