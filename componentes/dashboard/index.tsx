@@ -2,8 +2,10 @@ import DateComponent from "../ui/date";
 import Image from "next/image";
 import TitleSection from "@/componentes/ui/Title";
 import Cardprogresso from "../ui/Cardprogresso";
-import StatusCard from "../ui/StatusCard";
+import Conquistas from "./Conquistas";
+import Agenda from "./Agenda";
 import CardAcoes from "../ui/CardAcoes";
+import { BookOpen, Heart, Repeat, Target, Calendar, Star } from "lucide-react";
 
 export default function Dashboard() {
   return (
@@ -25,26 +27,23 @@ export default function Dashboard() {
       </div>
 
      <div className="mt-6 flex gap-4">
-      <Cardprogresso title="Hábitos" progressoDodia="Progresso do dia" progresso={70} barraDeProgresso={true} />
+      <Cardprogresso title="Hábitos" progressoDodia="Progresso do dia" progresso={70} barraDeProgresso={true} icon={<Target size={15}/>} />
      
-      <Cardprogresso title="Tarefas" progressoDodia="Progresso do dia" progresso={70} barraDeProgresso={true} />
+      <Cardprogresso title="Tarefas" progressoDodia="Progresso do dia" progresso={70} barraDeProgresso={true} icon={<Repeat size={15}/>} />
      
-      <Cardprogresso title="Estudos" progressoDodia="3.5h" progresso={70} barraDeProgresso={true} />
+      <Cardprogresso title="Estudos" progressoDodia="3.5h" progresso={70} barraDeProgresso={true} icon={<BookOpen size={15}/>} />
      
-      <Cardprogresso title="Treino" progressoDodia="Concluido" progresso={100} barraDeProgresso={true} />
+      <Cardprogresso title="Treino" progressoDodia="Concluido" progresso={100} barraDeProgresso={true} icon={<Heart size={15}/>} />
      </div>
+
 
      <div className="flex gap-4 mt-[2em]">
-      <StatusCard title="Agenda de Hoje" progressoDodia="Progresso do dia"  ></StatusCard>
-      <StatusCard title="Conquistas da Semana" progressoDodia="Progresso do dia"  ></StatusCard>
-     </div>
-
-     <div>
-    <CardAcoes title="Ações Rápidas" progressoDodia="Progresso do dia"  ></CardAcoes>
-    
+     <Agenda/>
+     <Conquistas/>
      </div>
 
 
+    <CardAcoes title="Ações Rápidas" ></CardAcoes>
     </div>
   );
 }
