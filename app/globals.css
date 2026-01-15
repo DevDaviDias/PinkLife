@@ -7,7 +7,7 @@
   --color-primary-light: #ffd1e3;
 
   /* 🌸 Backgrounds */
-  --color-bg-main: #fff1f6;
+  --color-bg-main: #f4e6eb;
   --color-bg-card: #ffffff;
   --color-bg-soft: #fff6fa;
 
@@ -50,7 +50,7 @@ body {
     box-sizing: border-box;
 }
 html, body, #__next {
-    height: 100%;
+    height: 100dvh;
     width: 100%;
     font-family: 'Geist Sans', sans-serif;
     background-color: var(--color-bg-main);

@@ -1,5 +1,6 @@
+import Home from "@/app/page";
 import Button from "@/componentes/ui/Button";
-import { Icon } from "lucide-react";
+import { BookOpen, DollarSign, Dumbbell, Heart, Icon, LayoutDashboard, Plane, Repeat, Sparkles, Target, Utensils, House   } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
@@ -21,32 +22,32 @@ export default function MenuHamburguer({ onChangeSessao }: { onChangeSessao: (se
       </div>
       <div className="gap-8">
         <ul>
-          <li>
-            <Button label="dashboard" onClick={() => onChangeSessao("dashboard")} />
+          <li className="flex aling-center gap-2 justify-center">
+            <Button label="Dashboard" onClick={() => onChangeSessao("dashboard")} icon={<House size={17}/>} />
           </li>             
           <li>
-            <Button label="Estudos" onClick={() => onChangeSessao("estudos")} />
+            <Button label="Estudos" onClick={() => onChangeSessao("estudos")} icon={<BookOpen size={17}/>} />
           </li>
           <li>
-            <Button label="Treino" onClick={() => onChangeSessao("treino")} />
+            <Button label="Treino" onClick={() => onChangeSessao("treino")} icon={<Dumbbell size={17}/>} />
           </li>
           <li>
-            <Button label="Hábitos" onClick={() => onChangeSessao("habitos")} />
+            <Button label="Hábitos" onClick={() => onChangeSessao("habitos")} icon={<Target size={17}/>} />
           </li>
           <li>
-            <Button label="Finanças" onClick={() => onChangeSessao("financas")} />
+            <Button label="Finanças" onClick={() => onChangeSessao("financas")} icon={<DollarSign size={17}/>} />
           </li>
           <li>
-            <Button label="Beleza" onClick={() => onChangeSessao("beleza")} />
+            <Button label="Beleza" onClick={() => onChangeSessao("beleza")} icon={<Sparkles size={17}/>} />
           </li>
           <li>
-            <Button label="Casa & Rotina" onClick={() => onChangeSessao("casa_rotina")} />
+            <Button label="Casa & Rotina" onClick={() => onChangeSessao("casa_rotina")} icon={<Plane size={17}/>} />
           </li>
           <li>
-            <Button label="Saúde" onClick={() => onChangeSessao("saude")} />
+            <Button label="Saúde" onClick={() => onChangeSessao("saude")} icon={<Heart size={17}/>} />
           </li>
           <li>
-            <Button label="Alimentação" onClick={() => onChangeSessao("alimentacao")} />
+            <Button label="Alimentação" onClick={() => onChangeSessao("alimentacao")} icon={<Utensils size={17}/>} />
           </li>
         </ul>
       </div>
