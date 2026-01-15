@@ -1,10 +1,18 @@
-
+import ContainerPages from "../ui/ContainerPages";
+import Cabecalho from "../ui/Cabecalho";
 
 export default function Estudos() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <h1 className="text-4xl font-bold mb-4">Sessão de Estudos</h1>
-      <p className="text-lg">Aqui você pode gerenciar seus estudos e acompanhar seu progresso!</p>
-    </div>
+    <>
+      <ContainerPages>
+       <Cabecalho
+          title="Seção de Estudos 📚"
+          imageSrc={"/images/hello-kitty-dashboard.jpg"}
+        >
+          <p className="">Organize seus estudos e acompanhe o progresso</p>
+        </Cabecalho>
+
+      </ContainerPages>
+    </>
   );
 }
