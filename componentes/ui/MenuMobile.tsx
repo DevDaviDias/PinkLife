@@ -60,6 +60,8 @@ export default function MenuMobile({ onChangeSessao }: MenuMobileProps) {
         <span className="text-[0.7em]">Finanças</span>
       </button>
 
+      
+
       <button
         onClick={() => onChangeSessao("saude")}
         className="flex flex-col items-center gap-1 text-gray-700 hover:text-pink-500 transition"
