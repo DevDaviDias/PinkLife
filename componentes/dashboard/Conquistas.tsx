@@ -1,4 +1,4 @@
-import StatusCard from "../ui/StatusCard";
+import StatusCard from "../ui/StatusCard ";
 import { Icon, Star } from "lucide-react";
 
 const conquistas = [

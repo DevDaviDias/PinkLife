@@ -3,13 +3,13 @@ import Cabecalho from "../ui/Cabecalho";
 import GrayMenu from "../ui/GrayMenu";
 import { useState } from "react";
 
-export default function Estudos() {
+export default function Alimentacao() {
   const [active, setActive] = useState("Hoje");
   return (
     <>
       <ContainerPages>
         <Cabecalho
-          title="Seção de Estudos 📚"
+          title="Alimentação 📚"
           imageSrc={"/images/hello-kitty-study.jpg"}
         >
           <p className="">Organize seus estudos e acompanhe o progresso</p>

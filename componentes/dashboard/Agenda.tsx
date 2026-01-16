@@ -1,4 +1,4 @@
-import StatusCard from "../ui/StatusCard";
+import StatusCard from "../ui/StatusCard ";
 import { Calendar } from "lucide-react";
 
 const agenda = [{

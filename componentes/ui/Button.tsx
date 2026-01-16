@@ -1,11 +1,7 @@
-import { ReactNode } from 'react';
-import { LucideIcon } from 'lucide-react';
-import { useState, useEffect } from "react";
-
 
 type ButtonProps = {
   icon?: React.ReactNode ;
-  label: string;
+  label?: string;
   onClick?: () => void;
  
 };
