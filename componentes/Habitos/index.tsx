@@ -15,7 +15,7 @@ export default function Habitos() {
           <p className="">Construa hábitos saudáveis dia a dia</p>
         </Cabecalho>
 
-  <div className="mt-6 flex gap-4">
+  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 mt-4  aling-center gap-[0.6em] justify-center md:gap-4">
           <Cardprogresso
             title="Hoje"
             progressoDodia="concluido"

@@ -17,7 +17,7 @@ export default function Estudos() {
         >
           <p className="">Organize seus estudos e acompanhe o progresso</p>
         </Cabecalho>
-         <div className="mt-6 flex gap-1 md:gap-4 ">
+         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 mt-4  aling-center gap-[0.6em] justify-center md:gap-4 ">
                           <Cardprogresso
                             title="Matérias"
                             progressoDodia="cadastradas"
