@@ -3,9 +3,10 @@ import Cardprogresso from "../ui/Cardprogresso";
 import Conquistas from "./Conquistas";
 import Agenda from "./Agenda";
 import CardAcoes from "../ui/CardAcoes";
-import { BookOpen, Heart, Repeat, Target, Calendar, Star } from "lucide-react";
+import { BookOpen, Heart, Repeat, Target,  } from "lucide-react";
 import Cabecalho from "../ui/Cabecalho";
 import ContainerPages from "../ui/ContainerPages";
+
 
 export default function Dashboard() {
   return (
@@ -18,29 +19,31 @@ export default function Dashboard() {
           <DateComponent />
         </Cabecalho>
 
-        <div className="mt-6 flex gap-4">
+       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 mt-4 aling-center gap-[0.6em] justify-center md:gap-4 ">
+        
           <Cardprogresso
             title="Hábitos"
-            progressoDodia="Progresso do dia"
+            progressoDodia="Progresso "
             progresso={70}
             barraDeProgresso={true}
-            icon={<Target size={15} />}
+            icon={<Target size={20} />}
           />
 
           <Cardprogresso
             title="Tarefas"
-            progressoDodia="Progresso do dia"
+            progressoDodia="Progresso "
             progresso={70}
             barraDeProgresso={true}
-            icon={<Repeat size={15} />}
+            icon={<Repeat size={20} />}
           />
+
 
           <Cardprogresso
             title="Estudos"
             progressoDodia="3.5h"
             progresso={70}
             barraDeProgresso={true}
-            icon={<BookOpen size={15} />}
+            icon={<BookOpen size={20} />}
           />
 
           <Cardprogresso
@@ -48,16 +51,17 @@ export default function Dashboard() {
             progressoDodia="Concluido"
             progresso={100}
             barraDeProgresso={true}
-            icon={<Heart size={15} />}
-          />
-        </div>
-
-        <div className="flex gap-4 mt-[2em]">
+            icon={<Heart size={20} />}
+          /></div>
+        
+        <div className="flex-col mb-4 flex gap-4 mt-[1.2em] md:mb-0 md:mt-[2em] md:flex-row">
           <Agenda />
           <Conquistas />
         </div>
-
-        <CardAcoes title="Ações Rápidas"></CardAcoes>
+<div className="hidden md:block">
+  <CardAcoes title="Ações Rápidas"></CardAcoes>
+</div>
+        
       </ContainerPages>
     </>
   );

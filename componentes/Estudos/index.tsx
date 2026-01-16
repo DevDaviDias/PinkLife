@@ -3,9 +3,11 @@ import Cabecalho from "../ui/Cabecalho";
 import Desenvolvimento from "../Desenvolvimento";
 import Cardprogresso from "../ui/Cardprogresso";
 import { Target, Repeat, BookOpen, Heart,Dumbbell, FireExtinguisherIcon, Hourglass } from "lucide-react";
-  
+import GrayMenu from "../ui/GrayMenu";
+import { useState } from "react";
 
 export default function Estudos() {
+    const [active,setActive] = useState("Hoje");
   return (
     <>
       <ContainerPages>
@@ -15,7 +17,7 @@ export default function Estudos() {
         >
           <p className="">Organize seus estudos e acompanhe o progresso</p>
         </Cabecalho>
-         <div className="mt-6 flex gap-4">
+         <div className="mt-6 flex gap-1 md:gap-4 ">
                           <Cardprogresso
                             title="Matérias"
                             progressoDodia="cadastradas"
@@ -38,7 +40,17 @@ export default function Estudos() {
                           />
                         </div>
                         
+        <GrayMenu items={[
+            { title: "Matéria", onClick: () => setActive("Hoje"), active: active === "Hoje" },
+            { title: "Cronõmetro", onClick: () => setActive("Semana"), active: active === "Semana" },
+            { title: "Histórico", onClick: () => setActive("Historico"), active: active === "Historico" }
+        ]} />
 
+        <div className="mt-4">
+            {active === "Hoje" && <p>Conteúdo da seção Hoje</p>}
+            {active === "Semana" && <p>Conteúdo da seção Semana</p>}
+            {active === "Historico" && <p>Conteúdo da seção Histórico</p> }           
+        </div>
      
         <Desenvolvimento />
 

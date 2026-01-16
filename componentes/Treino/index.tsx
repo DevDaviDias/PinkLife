@@ -4,8 +4,12 @@ import Desenvolvimento from "../Desenvolvimento";
 import Cardprogresso from "../ui/Cardprogresso";
 import { Target, Repeat, BookOpen, Heart, Dumbbell, FireExtinguisher, FireExtinguisherIcon } from "lucide-react";
 import { Figtree } from "next/font/google";
+import { useState } from "react";
+import GrayMenu from "../ui/GrayMenu";
 
 export default function Treino() {
+  const [active,setActive] = useState("Hoje");
+
   return (
     <>
       <ContainerPages>
@@ -46,6 +50,7 @@ export default function Treino() {
                     icon={<Target size={15} />}
                   />
                 </div>
+                
 <Desenvolvimento />
       </ContainerPages>
     </>

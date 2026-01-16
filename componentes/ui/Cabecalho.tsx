@@ -6,7 +6,7 @@ interface HeaderSectionProps {
   title: string;
   imageSrc?: string;
   imageAlt?: string;
-  children?: ReactNode; // 👈 conteúdo variável
+  children?: ReactNode; 
 }
 
 export default function Cabecalho({
@@ -28,9 +28,9 @@ export default function Cabecalho({
         <Image
           src={imageSrc}
           alt={imageAlt}
-          width={50}
-          height={200}
-          className="rounded-full mt-4 mb-4 animate-bounce"
+          width={100}
+          height={400}
+          className="rounded-full animate-pulse-soft object-cover"
         />
       </div>
     </div>

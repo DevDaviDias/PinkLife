@@ -18,17 +18,17 @@ const conquistas = [
 export default function Conquistas() {
   return (
     <>
-      <StatusCard title="Conquistas da Semana" icon={<Star size={15} />}>
+      <StatusCard title="Conquistas da Semana" icon={<Star size={20} />}>
         <div>
           {conquistas.map((item, index) => (
             <div
               key={index}
-              className="flex items-center gap-4 mb-1  p-[0.4em] rounded-lg w-full"
+              className="flex items-center gap-4 mb-2 h-[3.4em]  p-[0.5em] rounded-lg w-full"
               style={{ backgroundColor: item.cor }}
             >
-              <div className="h-6 rounded-full  "></div>
-              <Star size={15} color="white" />
-              <div className="text-[0.8em] ">
+              <div className="h-4 rounded-full md:h-7 "></div>
+              <Star size={20} color="white" />
+              <div className=" text-[0.9em] md:text-[1em] ">
                 <p className="font-semibold text-white">{item.descricao}</p>
               </div>
             </div>
