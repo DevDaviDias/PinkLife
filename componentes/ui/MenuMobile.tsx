@@ -52,12 +52,12 @@ export default function MenuMobile({ onChangeSessao }: MenuMobileProps) {
       </button>
 
       <button
-        onClick={() => onChangeSessao("alimentacao")}
+        onClick={() => onChangeSessao("financas")}
         className="flex flex-col items-center gap-1 text-gray-700 hover:text-pink-500 transition"
-        aria-label="Alimentação"
+        aria-label="financas"
       >
-        <Utensils size={22} />
-        <span className="text-[0.7em]">Comida</span>
+        <DollarSign size={22} />
+        <span className="text-[0.7em]">Finanças</span>
       </button>
 
       <button
