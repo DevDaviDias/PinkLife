@@ -50,6 +50,32 @@ export default function Treino() {
                     icon={<Target size={15} />}
                   />
                 </div>
+                 <GrayMenu items ={[
+                         {
+                           title: "Hoje",
+                            onClick: () => setActive("Hoje"),
+                                  active: active === "Registrar"
+                           
+                         },
+                         {
+                           title: "Meus Treinos",
+                            onClick: () => setActive("TabeMeus Treinosla"),
+                                  active: active === "Meus Treinos"
+                         },
+                         {
+                           title: "Criar Treinos",
+                            onClick: () => setActive("Criar Treinos"),
+                                  active: active === "Criar Treinos"
+                         },
+                         {
+                           title: "Hitorico",
+                            onClick: () => setActive("Hitorico"),
+                                  active: active === "Hitorico"
+                         }
+                      ]}
+                       
+                      
+                      />
                 
 <Desenvolvimento />
       </ContainerPages>

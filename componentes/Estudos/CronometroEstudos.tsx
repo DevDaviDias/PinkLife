@@ -54,7 +54,7 @@ export default function CronometroEstudos({
   }
 
   return (
-    <div className="space-y-4 ">
+    <div className="space-y-2 ">
 
        <div className="text-center text-pink-500 text-[2em] font-bold">
         {formatar(tempo)}
@@ -99,10 +99,10 @@ export default function CronometroEstudos({
       </div>
      
       <input
-        placeholder="Anotações dos estudos de hoje:"
+        placeholder="O que estudamos hoje:"
         value={comentario}
         onChange={(e) => setComentario(e.target.value)}
-        className="border p-2 w-full rounded"
+        className="border p-2 pb-6 w-full rounded"
       />
 
      

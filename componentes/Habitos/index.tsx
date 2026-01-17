@@ -3,8 +3,11 @@ import Cabecalho from "../ui/Cabecalho";
 import Desenvolvimento from "../Desenvolvimento";
 import Cardprogresso from "../ui/Cardprogresso";
 import { Target, Repeat, BookOpen, Heart } from "lucide-react";
+import GrayMenu from "../ui/GrayMenu";
+import { useState } from "react";
 
 export default function Habitos() {
+  const [active,setActive]= useState("Historico")
   return (
     <>
       <ContainerPages>
@@ -44,9 +47,42 @@ export default function Habitos() {
             icon={<Heart size={15} />}
           />
         </div>
+
+         <GrayMenu items ={[
+                                 {
+                                   title: "Hoje",
+                                    onClick: () => setActive("Hoje"),
+                                          active: active === "Hoje"
+                                   
+                                 },
+                                 {
+                                   title: "Meus Treinos",
+                                    onClick: () => setActive("MeusTreinos"),
+                                          active: active === "MeusTreinos"
+                                 },
+                                 {
+                                   title: "Criar Treinos",
+                                    onClick: () => setActive("CriarTreinos"),
+                                          active: active === "CriarTreinos"
+                                 },
+                                 {
+                                   title: "Hitórico",
+                                    onClick: () => setActive("Historico"),
+                                          active: active === "Historico"
+                                 }
+                              ]}
+                               
+                              
+                              />
+
+                              {active === "Hoje" && (<p>Aqui iram ficar os registros de hoje.</p>)}
+                              {active === "MeusTreinos" && (<p>Meus treinos</p>)}
+                              {active === "CriarTreinos" && (<p>Criação de treinos</p>)}
+                              {active === "Historico" && (<p>Histórico dos treinos</p>)}
+
          
 
-        <Desenvolvimento />
+        
       </ContainerPages>
     </>
   );

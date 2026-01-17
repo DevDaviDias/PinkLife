@@ -10,9 +10,6 @@ import StatusCard2 from "../ui/StatusCard2";
 import CronometroEstudos from "@/componentes/Estudos/CronometroEstudos";
 import { BookOpen, Hourglass, Target } from "lucide-react";
 
-/* =========================
-   TIPOS
-========================= */
 export interface Materia {
   id: number;
   nome: string;
@@ -110,12 +107,13 @@ export default function Estudos() {
       </Cabecalho>
 
       {/* CARDS RESUMO */}
-      <div className="grid grid-cols-2 md:grid-cols-4 mt-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 mt-4 gap-4">
         <Cardprogresso
           title="Matérias"
           progressoDodia="cadastradas"
           porcentagem={materias.length}
           icon={<BookOpen size={16} />}
+          className=""
         />
 
         <Cardprogresso
@@ -158,7 +156,7 @@ export default function Estudos() {
       <div className="mt-4">
         {/* ADICIONAR MATÉRIA */}
         {active === "Hoje" && (
-          <StatusCard title="Adicionar Nova Matéria">
+          <StatusCard width="" title="Adicionar Nova Matéria">
             <div className="grid md:grid-cols-2 gap-4">
               <input
                 placeholder="Nome da matéria"
@@ -183,7 +181,7 @@ export default function Estudos() {
               + Nova Matéria
             </button>
 
-            <div className="mt-8 grid sm:grid-cols-2 md:mt-20">
+            <div className="mt-8 grid sm:grid-cols-1 md:mt-20">
               {materias.map((m) => (
                 <Cardprogresso
                   key={m.id}
@@ -200,19 +198,21 @@ export default function Estudos() {
           </StatusCard>
         )}
 
-        {/* CRONÔMETRO */}
+      
         {active === "Semana" && (
+         <div className="flex align-center justify-center">
           <StatusCard2 title="Cronômetro de Estudos">
             <CronometroEstudos
               materias={materias.map((m) => m.nome)}
               onFinalizar={finalizarSessao}
             />
           </StatusCard2>
+          </div>
         )}
 
-        {/* HISTÓRICO */}
+       
         {active === "Historico" && (
-          <StatusCard title="Histórico de Estudos">
+          <StatusCard width="h-full" title="Histórico de Estudos"> 
             <ul className="space-y-2">
               {historico.map((h) => (
                 <li key={h.id} className="border p-3 rounded">
