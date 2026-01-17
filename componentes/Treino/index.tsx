@@ -54,23 +54,23 @@ export default function Treino() {
                          {
                            title: "Hoje",
                             onClick: () => setActive("Hoje"),
-                                  active: active === "Registrar"
+                                  active: active === "Hoje"
                            
                          },
                          {
                            title: "Meus Treinos",
-                            onClick: () => setActive("TabeMeus Treinosla"),
-                                  active: active === "Meus Treinos"
+                            onClick: () => setActive("MeusTreinos"),
+                                  active: active === "MeusTreinos"
                          },
                          {
                            title: "Criar Treinos",
-                            onClick: () => setActive("Criar Treinos"),
-                                  active: active === "Criar Treinos"
+                            onClick: () => setActive("CriarTreinos"),
+                                  active: active === "CriarTreinos"
                          },
                          {
-                           title: "Hitorico",
-                            onClick: () => setActive("Hitorico"),
-                                  active: active === "Hitorico"
+                           title: "Histórico",
+                            onClick: () => setActive("Historico"),
+                                  active: active === "Historico"
                          }
                       ]}
                        

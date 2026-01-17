@@ -5,6 +5,9 @@ import {
   Heart,
   House,
   Utensils,
+  Sparkles,
+  Plane,
+  ClipboardList,
 } from "lucide-react";
 
 type MenuMobileProps = {
@@ -12,64 +15,45 @@ type MenuMobileProps = {
 };
 
 export default function MenuMobile({ onChangeSessao }: MenuMobileProps) {
+  const menuItems = [
+    { id: "dashboard", label: "Início", icon: House },
+    { id: "estudos", label: "Estudos", icon: BookOpen },
+    { id: "treino", label: "Treino", icon: Dumbbell },
+    { id: "habitos", label: "Hábitos", icon: ClipboardList },
+    { id: "financas", label: "Finanças", icon: DollarSign },
+    { id: "beleza", label: "Beleza", icon: Sparkles },
+    { id: "viagens", label: "Viagens", icon: Plane },
+    { id: "casa", label: "Casa & Rotina", icon: House },
+    { id: "saude", label: "Saúde", icon: Heart },
+    { id: "alimentacao", label: "Alimentação", icon: Utensils },
+  ];
+
   return (
     <nav
       className="
         fixed bottom-0 left-0 z-50
-        flex justify-around items-center
         h-[5.2em] w-full
         bg-white
         border-t-2 border-pink-400
         shadow-lg
         lg:hidden
+        overflow-x-auto
+        whitespace-nowrap
       "
     >
-      <button
-        onClick={() => onChangeSessao("dashboard")}
-        className="flex flex-col items-center gap-1 text-gray-700 hover:text-pink-500 transition"
-        aria-label="Dashboard"
-      >
-        <House size={22} />
-        <span className="text-[0.7em]">Início</span>
-      </button>
-
-      <button
-        onClick={() => onChangeSessao("estudos")}
-        className="flex flex-col items-center gap-1 text-gray-700 hover:text-pink-500 transition"
-        aria-label="Estudos"
-      >
-        <BookOpen size={22} />
-        <span className="text-[0.7em]">Estudos</span>
-      </button>
-
-      <button
-        onClick={() => onChangeSessao("treino")}
-        className="flex flex-col items-center gap-1 text-gray-700 hover:text-pink-500 transition"
-        aria-label="Treino"
-      >
-        <Dumbbell size={22} />
-        <span className="text-[0.7em]">Treino</span>
-      </button>
-
-      <button
-        onClick={() => onChangeSessao("financas")}
-        className="flex flex-col items-center gap-1 text-gray-700 hover:text-pink-500 transition"
-        aria-label="financas"
-      >
-        <DollarSign size={22} />
-        <span className="text-[0.7em]">Finanças</span>
-      </button>
-
-      
-
-      <button
-        onClick={() => onChangeSessao("saude")}
-        className="flex flex-col items-center gap-1 text-gray-700 hover:text-pink-500 transition"
-        aria-label="Saúde"
-      >
-        <Heart size={22} />
-        <span className="text-[0.7em]">Saúde</span>
-      </button>
+      <div className="flex">
+        {menuItems.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => onChangeSessao(id)}
+            className="flex flex-col items-center justify-center gap-1 px-4 text-gray-700 hover:text-pink-500 transition"
+            aria-label={label}
+          >
+            <Icon size={22} />
+            <span className="text-[0.7em]">{label}</span>
+          </button>
+        ))}
+      </div>
     </nav>
   );
 }
