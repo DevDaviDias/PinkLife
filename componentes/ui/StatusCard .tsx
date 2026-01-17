@@ -2,7 +2,8 @@ type PropsProgresso = {
     children?: React.ReactNode;
   icon?: React.ReactNode;
   title?: string;
-  width?: string
+  width?: string;
+  
 }
 
 export default function StatusCard({

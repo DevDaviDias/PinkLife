@@ -133,30 +133,40 @@ export default function Estudos() {
         />
       </div>
 
-      <GrayMenu
-        items={[
-          {
-            title: "Matéria",
-            onClick: () => setActive("Hoje"),
-            active: active === "Hoje",
-          },
-          {
-            title: "Cronômetro",
-            onClick: () => setActive("Semana"),
-            active: active === "Semana",
-          },
-          {
-            title: "Histórico",
-            onClick: () => setActive("Historico"),
-            active: active === "Historico",
-          },
-        ]}
-      />
+  <GrayMenu
+  items={[
+    {
+      title: "Matéria",
+      onClick: () => {
+        setActive("Hoje");
+        document.getElementById("section-hoje")?.scrollIntoView({ behavior: "smooth" });
+      },
+      active: active === "Hoje",
+    },
+    {
+      title: "Cronômetro",
+      onClick: () => {
+        setActive("Semana");
+        document.getElementById("section-semana")?.scrollIntoView({ behavior: "smooth" });
+      },
+      active: active === "Semana",
+    },
+    {
+      title: "Histórico",
+      onClick: () => {
+        setActive("Historico");
+        document.getElementById("section-historico")?.scrollIntoView({ behavior: "smooth" });
+      },
+      active: active === "Historico",
+    },
+  ]}
+/>
+
 
       <div className="mt-4">
         {/* ADICIONAR MATÉRIA */}
         {active === "Hoje" && (
-          <StatusCard width="" title="Adicionar Nova Matéria">
+          <StatusCard  width="" title="Adicionar Nova Matéria">
             <div className="grid md:grid-cols-2 gap-4">
               <input
                 placeholder="Nome da matéria"

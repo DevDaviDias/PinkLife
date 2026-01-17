@@ -77,9 +77,9 @@ export default function Financas() {
                   active: active === "Gráfico"
          },
          {
-           title: "Calculadora",
+           title: "Calculardora",
             onClick: () => setActive("Calculadora"),
-                  active: active === "HoCalculadoraje"
+                  active: active === "calculardora"
          }
       ]}
        

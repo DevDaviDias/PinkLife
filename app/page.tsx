@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-
 import Dashboard from "@/componentes/dashboard";
 import MenuHamburguer from "@/componentes/Menuhamburguer";
 import MenuMobile from "@/componentes/ui/MenuMobile";
-
 import Estudos from "@/componentes/Estudos";
 import Saude from "@/componentes/Saude";
 import Viagens from "@/componentes/Viagens";
@@ -15,6 +13,7 @@ import Treino from "@/componentes/Treino";
 import Habitos from "@/componentes/Habitos";
 import Financas from "@/componentes/Financas";
 import Beleza from "@/componentes/Beleza";
+import Configuracoes from "@/componentes/Configuracao";
 
 export default function Home() {
   const [sessao, setSessao] = useState("dashboard");
@@ -43,6 +42,7 @@ export default function Home() {
         {sessao === "saude" && <Saude />}
         {sessao === "viagens" && <Viagens />}
         {sessao === "alimentacao" && <Alimentacao />}
+        {sessao === "Configuracao" && <Configuracoes/>}
       </main>
     </>
   );

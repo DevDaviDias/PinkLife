@@ -6,8 +6,8 @@ export default function Desenvolvimento() {
         <Image src="/images/hello-kitty-dashboard_variant_1.jpg" alt="Logo" width={50} height={50} className="animate-bounce rounded-[50%]"/>
       <h2 className="text-pink-400 text-2xl font-bold">Em Desenvolvimento🌸</h2>
       <p className="w-[44em]">
-        Estamos constantemente trabalhando para melhorar sua experiência no
-        PinkLife. Novos recursos e melhorias estão a caminho!
+        Estamos constantemente trabalhando <br />para melhorar sua experiência no
+        PinkLife. <br />Novos recursos e melhorias estão a caminho!
       </p>
     </div>
   );

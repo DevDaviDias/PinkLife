@@ -29,6 +29,7 @@ export default function MenuMobile({ onChangeSessao }: MenuMobileProps) {
     { id: "casa", label: "Casa & Rotina", icon: House },
     { id: "saude", label: "Saúde", icon: Heart },
     { id: "alimentacao", label: "Alimentação", icon: Utensils },
+    { id: "Configuracao", label: "Configuracao", icon: Utensils },
   ];
 
   return (

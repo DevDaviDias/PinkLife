@@ -8,9 +8,10 @@ import {
   Plane,
   Sparkles,
   Target,
-  Utensils,
+  Utensils,Settings
 } from "lucide-react";
 import Image from "next/image";
+
 
 type MenuHamburguerProps = {
   onChangeSessao: (sessao: string) => void;
@@ -119,6 +120,13 @@ export default function MenuHamburguer({
               label="Alimentação"
               onClick={() => onChangeSessao("alimentacao")}
               icon={<Utensils size={18} />}
+            />
+          </li>
+           <li>
+            <Button
+              label="Configurações"
+              onClick={() => onChangeSessao("Configuracao")}
+              icon={<Settings size={18} />}
             />
           </li>
         </ul>
