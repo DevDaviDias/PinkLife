@@ -42,7 +42,7 @@ export default function Home() {
         {sessao === "saude" && <Saude />}
         {sessao === "viagens" && <Viagens />}
         {sessao === "alimentacao" && <Alimentacao />}
-        {sessao === "Configuracao" && <Configuracoes/>}
+        {sessao === "Configuracoes" && <Configuracoes/>}
       </main>
     </>
   );

@@ -1,21 +1,25 @@
-
 type ButtonProps = {
-  icon?: React.ReactNode ;
+  icon?: React.ReactNode;
   label?: string;
   onClick?: () => void;
- 
+  className?: string;
 };
 
 export default function Button({
   icon,
   label,
-  onClick
+  onClick,
+  className,
 }: ButtonProps) {
   return (
-    <button onClick={onClick} className="bg-white text-black px-4 py-2  hover:bg-pink-300 hover:text-white transition flex items-center rounded-[0.5em] w-full" >
-     
-      <span className='flex gap-3 text-[1.2em]'> {icon}{label} </span>
-      
+    <button
+      onClick={onClick}
+      className={`px-4 py-2 transition flex items-center rounded-[0.5em] w-full ${className}`}
+    >
+      <span className="flex gap-3 text-[1.2em]">
+        {icon}
+        {label}
+      </span>
     </button>
   );
 }

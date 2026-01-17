@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Button from "@/componentes/ui/Button";
 import {
   BookOpen,
@@ -8,10 +11,10 @@ import {
   Plane,
   Sparkles,
   Target,
-  Utensils,Settings
+  Utensils,
+  Settings,
 } from "lucide-react";
 import Image from "next/image";
-
 
 type MenuHamburguerProps = {
   onChangeSessao: (sessao: string) => void;
@@ -20,6 +23,31 @@ type MenuHamburguerProps = {
 export default function MenuHamburguer({
   onChangeSessao,
 }: MenuHamburguerProps) {
+  const [activeSessao, setActiveSessao] = useState("dashboard");
+
+  const handleClick = (sessao: string) => {
+    setActiveSessao(sessao);
+    onChangeSessao(sessao);
+  };
+
+  const menuItems = [
+    { id: "dashboard", label: "Dashboard", icon: <House size={18} /> },
+    { id: "estudos", label: "Estudos", icon: <BookOpen size={18} /> },
+    { id: "treino", label: "Treino", icon: <Dumbbell size={18} /> },
+    { id: "habitos", label: "Hábitos", icon: <Target size={18} /> },
+    { id: "financas", label: "Finanças", icon: <DollarSign size={18} /> },
+    { id: "beleza", label: "Beleza", icon: <Sparkles size={18} /> },
+    { id: "viagens", label: "Viagens", icon: <Plane size={18} /> },
+    { id: "casa_rotina", label: "Casa & Rotina", icon: <House size={18} /> },
+    { id: "saude", label: "Saúde", icon: <Heart size={18} /> },
+    { id: "alimentacao", label: "Alimentação", icon: <Utensils size={18} /> },
+    {
+      id: "configuracao",
+      label: "Configurações",
+      icon: <Settings size={18} />,
+    },
+  ];
+
   return (
     <aside
       className="
@@ -49,86 +77,22 @@ export default function MenuHamburguer({
         </div>
       </div>
 
-      {/* Navegação */}
       <nav>
         <ul className="flex flex-col gap-2">
-          <li>
-            <Button
-              label="Dashboard"
-              onClick={() => onChangeSessao("dashboard")}
-              icon={<House size={18} />}
-            />
-          </li>
-          <li>
-            <Button
-              label="Estudos"
-              onClick={() => onChangeSessao("estudos")}
-              icon={<BookOpen size={18} />}
-            />
-          </li>
-          <li>
-            <Button
-              label="Treino"
-              onClick={() => onChangeSessao("treino")}
-              icon={<Dumbbell size={18} />}
-            />
-          </li>
-          <li>
-            <Button
-              label="Hábitos"
-              onClick={() => onChangeSessao("habitos")}
-              icon={<Target size={18} />}
-            />
-          </li>
-          <li>
-            <Button
-              label="Finanças"
-              onClick={() => onChangeSessao("financas")}
-              icon={<DollarSign size={18} />}
-            />
-          </li>
-          <li>
-            <Button
-              label="Beleza"
-              onClick={() => onChangeSessao("beleza")}
-              icon={<Sparkles size={18} />}
-            />
-          </li>
-          <li>
-            <Button
-              label="Viagens"
-              onClick={() => onChangeSessao("viagens")}
-              icon={<Plane size={18} />}
-            />
-          </li>
-          <li>
-            <Button
-              label="Casa & Rotina"
-              onClick={() => onChangeSessao("casa_rotina")}
-              icon={<House size={18} />}
-            />
-          </li>
-          <li>
-            <Button
-              label="Saúde"
-              onClick={() => onChangeSessao("saude")}
-              icon={<Heart size={18} />}
-            />
-          </li>
-          <li>
-            <Button
-              label="Alimentação"
-              onClick={() => onChangeSessao("alimentacao")}
-              icon={<Utensils size={18} />}
-            />
-          </li>
-           <li>
-            <Button
-              label="Configurações"
-              onClick={() => onChangeSessao("Configuracao")}
-              icon={<Settings size={18} />}
-            />
-          </li>
+          {menuItems.map(({ id, label, icon }) => (
+            <li key={id}>
+              <Button
+                label={label}
+                onClick={() => handleClick(id)}
+                icon={icon}
+                className={
+                  activeSessao === id
+                    ? "bg-pink-400 text-white hover:text-amber-50"
+                    : "bg-white text-black hover:bg-pink-300 hover:text-amber-50"
+                }
+              />
+            </li>
+          ))}
         </ul>
       </nav>
 

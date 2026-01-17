@@ -3,10 +3,9 @@ import Cardprogresso from "../ui/Cardprogresso";
 import Conquistas from "./Conquistas";
 import Agenda from "./Agenda";
 import CardAcoes from "../ui/CardAcoes";
-import { BookOpen, Heart, Repeat, Target,  } from "lucide-react";
+import { BookOpen, Heart, Repeat, Target } from "lucide-react";
 import Cabecalho from "../ui/Cabecalho";
 import ContainerPages from "../ui/ContainerPages";
-
 
 export default function Dashboard() {
   return (
@@ -19,8 +18,7 @@ export default function Dashboard() {
           <DateComponent />
         </Cabecalho>
 
-       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 mt-4 aling-center gap-[0.6em] justify-center md:gap-4 ">
-        
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 mt-4 aling-center gap-[0.6em] justify-center md:gap-4 ">
           <Cardprogresso
             title="Hábitos"
             progressoDodia="Progresso "
@@ -37,7 +35,6 @@ export default function Dashboard() {
             icon={<Repeat size={20} />}
           />
 
-
           <Cardprogresso
             title="Estudos"
             progressoDodia="3.5h"
@@ -52,16 +49,16 @@ export default function Dashboard() {
             progresso={100}
             barraDeProgresso={true}
             icon={<Heart size={20} />}
-          /></div>
-        
+          />
+        </div>
+
         <div className="flex-col mb-4 flex gap-4 mt-[1.2em] md:mb-0 md:mt-[2em] md:flex-row">
           <Agenda />
           <Conquistas />
         </div>
-<div className="hidden md:block">
-  <CardAcoes title="Ações Rápidas"></CardAcoes>
-</div>
-        
+        <div className="hidden md:block">
+          <CardAcoes title="Ações Rápidas"></CardAcoes>
+        </div>
       </ContainerPages>
     </>
   );

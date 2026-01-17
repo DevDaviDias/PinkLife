@@ -8,6 +8,7 @@ import {
   Sparkles,
   Plane,
   ClipboardList,
+  Settings,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -29,7 +30,7 @@ export default function MenuMobile({ onChangeSessao }: MenuMobileProps) {
     { id: "casa", label: "Casa & Rotina", icon: House },
     { id: "saude", label: "Saúde", icon: Heart },
     { id: "alimentacao", label: "Alimentação", icon: Utensils },
-    { id: "Configuracao", label: "Configuracao", icon: Utensils },
+    { id: "Configuracao", label: "Configuracao", icon: Settings},
   ];
 
   return (
