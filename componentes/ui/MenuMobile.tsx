@@ -9,12 +9,15 @@ import {
   Plane,
   ClipboardList,
 } from "lucide-react";
+import { useState } from "react";
 
 type MenuMobileProps = {
   onChangeSessao: (sessao: string) => void;
 };
 
 export default function MenuMobile({ onChangeSessao }: MenuMobileProps) {
+  const [activeSessao, setActiveSessao] = useState("dashboard");
+
   const menuItems = [
     { id: "dashboard", label: "Início", icon: House },
     { id: "estudos", label: "Estudos", icon: BookOpen },
@@ -45,8 +48,16 @@ export default function MenuMobile({ onChangeSessao }: MenuMobileProps) {
         {menuItems.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
-            onClick={() => onChangeSessao(id)}
-            className="flex flex-col items-center justify-center gap-1 px-4 text-gray-700 hover:text-pink-500 transition"
+            onClick={() => {
+              setActiveSessao(id);
+              onChangeSessao(id);
+            }}
+            className={`flex flex-col mt-[1em] items-center justify-center gap-1 px-4 transition
+              ${
+                activeSessao === id
+                  ? "text-pink-500 font-semibold"
+                  : "text-gray-700 hover:text-pink-500"
+              }`}
             aria-label={label}
           >
             <Icon size={22} />
