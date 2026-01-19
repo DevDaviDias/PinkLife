@@ -42,21 +42,8 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
   return (
     <div className="relative min-h-screen bg-gray-100 flex items-center justify-center overflow-hidden">
       
-      {/* Fundo das pétalas */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {Array.from({ length: 15 }).map((_, i) => (
-          <span
-            key={i}
-            className="absolute w-3 h-3 bg-pink-300 rounded-full opacity-70 animate-fall"
-            style={{
-              top: `${Math.random() * 100}%`,
-              right: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${5 + Math.random() * 5}s`,
-            }}
-          />
-        ))}
-      </div>
+      
+   
 
       {/* Formulário */}
       <form
