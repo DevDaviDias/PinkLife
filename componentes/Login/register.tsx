@@ -76,7 +76,10 @@ export default function Register({
 
         {error && <p className="text-red-600 mb-3 text-sm">{error}</p>}
         {success && <p className="text-green-600 mb-3 text-sm">{success}</p>}
- <span className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-500">
+
+
+        <div className="relative w-full mb-4">
+          <span className="absolute left-3 top-1/3 -translate-y-1/2 text-pink-500">
             <IconUser size={20} />
           </span>
         <input
@@ -86,9 +89,11 @@ export default function Register({
           onChange={(e) => setName(e.target.value)}
            className="w-full mb-5 pl-10 p-3 border-2 border-pink-400 rounded-xl text-gray-800 placeholder:text-gray-400 placeholder:italic focus:border-pink-600 focus:text-pink-600 focus:placeholder-pink-300 hover:border-pink-500 outline-none shadow-sm focus:shadow-md transition duration-300 ease-in-out"
           required
-        />
- <span className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-500">
-            <IconUser size={20} />
+        /></div>
+
+         <div className="relative w-full mb-4">
+          <span className="absolute left-3 top-1/3 -translate-y-1/2 text-pink-500">
+            <IconMail size={20} />
           </span>
         <input
           type="email"
@@ -97,9 +102,12 @@ export default function Register({
           onChange={(e) => setEmail(e.target.value)}
           className="w-full  mb-5 pl-10 p-3 border-2 border-pink-400 rounded-xl text-gray-800 placeholder:text-gray-400 placeholder:italic focus:border-pink-600 focus:text-pink-600 focus:placeholder-pink-300 hover:border-pink-500 outline-none shadow-sm focus:shadow-md transition duration-300 ease-in-out"
           required
-        />
- <span className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-500">
-            <IconUser size={20} />
+        /></div>
+
+          <div className="relative w-full mb-4">
+          <span className="absolute left-3 top-1/3 -translate-y-1/2 text-pink-500">
+            <IconLock size={20} />
+         
           </span>
         <input
           type="password"
@@ -108,17 +116,21 @@ export default function Register({
           onChange={(e) => setPassword(e.target.value)}
           className="w-full  mb-5 pl-10 p-3 border-2 border-pink-400 rounded-xl text-gray-800 placeholder:text-gray-400 placeholder:italic focus:border-pink-600 focus:text-pink-600 focus:placeholder-pink-300 hover:border-pink-500 outline-none shadow-sm focus:shadow-md transition duration-300 ease-in-out"
           required
-        />
- <span className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-500">
-            <IconUser size={20} />
+        /></div>
+
+
+  <div className="relative w-full mb-4">
+          <span className="absolute left-3 top-1/3 -translate-y-1/2 text-pink-500">
+            <IconLock size={20} />
           </span>
+
         <input
           type="password"
           placeholder="Confirme a senha"
           value={confirmpassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           className="w-full  mb-5 pl-10 p-3 border-2 border-pink-400 rounded-xl text-gray-800 placeholder:text-gray-400 placeholder:italic focus:border-pink-600 focus:text-pink-600 focus:placeholder-pink-300 hover:border-pink-500 outline-none shadow-sm focus:shadow-md transition duration-300 ease-in-out"
-        />
+        /></div>
 
         <button
           type="submit"
