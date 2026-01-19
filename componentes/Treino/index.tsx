@@ -2,8 +2,8 @@ import ContainerPages from "../ui/ContainerPages";
 import Cabecalho from "../ui/Cabecalho";
 import Desenvolvimento from "../Desenvolvimento";
 import Cardprogresso from "../ui/Cardprogresso";
-import { Target, Repeat, BookOpen, Heart, Dumbbell, FireExtinguisher, FireExtinguisherIcon } from "lucide-react";
-import { Figtree } from "next/font/google";
+import { Target, Repeat, Dumbbell,  FireExtinguisherIcon } from "lucide-react";
+
 import { useState } from "react";
 import GrayMenu from "../ui/GrayMenu";
 

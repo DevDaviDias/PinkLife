@@ -41,10 +41,7 @@ export default function MenuHamburguer({
     { id: "casa_rotina", label: "Casa & Rotina", icon: <House size={18} /> },
     { id: "saude", label: "Saúde", icon: <Heart size={18} /> },
     { id: "alimentacao", label: "Alimentação", icon: <Utensils size={18} /> },
-    {
-      id: "configuracao",
-      label: "Configurações",
-      icon: <Settings size={18} />,
+    { id: "Configuracao",label: "Configuracao",icon: <Settings size={18} />,
     },
   ];
 

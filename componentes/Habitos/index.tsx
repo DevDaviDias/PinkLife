@@ -1,6 +1,5 @@
 import ContainerPages from "../ui/ContainerPages";
 import Cabecalho from "../ui/Cabecalho";
-import Desenvolvimento from "../Desenvolvimento";
 import Cardprogresso from "../ui/Cardprogresso";
 import { Target, Repeat, BookOpen, Heart } from "lucide-react";
 import GrayMenu from "../ui/GrayMenu";

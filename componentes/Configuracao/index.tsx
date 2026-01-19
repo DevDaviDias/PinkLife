@@ -1,4 +1,4 @@
-import { Moon, Bell, User, Trash, Settings } from "lucide-react";
+import { Moon, Bell, Trash} from "lucide-react";
 import { useState } from "react";
 import ContainerPages from "@/componentes/ui/ContainerPages"
 

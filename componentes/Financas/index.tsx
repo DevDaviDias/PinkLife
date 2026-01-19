@@ -2,10 +2,8 @@ import ContainerPages from "../ui/ContainerPages";
 import Cabecalho from "../ui/Cabecalho";
 import Cardprogresso from "../ui/Cardprogresso"
 import Desenvolvimento from "../Desenvolvimento";
-import { info } from "console";
 import { TrendingUp,TrendingDown,DollarSign  } from "lucide-react";
 import GrayMenu from "@/componentes/ui/GrayMenu"
-import { title } from "process";
 import { useState } from "react";
 const conteudo = [
   
