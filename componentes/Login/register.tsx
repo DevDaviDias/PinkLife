@@ -79,7 +79,7 @@ export default function Register({
 
 
         <div className="relative w-full mb-4">
-          <span className="absolute left-3 top-1/3 -translate-y-1/2 text-pink-500">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-500">
             <IconUser size={20} />
           </span>
         <input
@@ -87,12 +87,12 @@ export default function Register({
           placeholder="Nome"
           value={name}
           onChange={(e) => setName(e.target.value)}
-           className="w-full mb-5 pl-10 p-3 border-2 border-pink-400 rounded-xl text-gray-800 placeholder:text-gray-400 placeholder:italic focus:border-pink-600 focus:text-pink-600 focus:placeholder-pink-300 hover:border-pink-500 outline-none shadow-sm focus:shadow-md transition duration-300 ease-in-out"
+           className="w-full  pl-10 p-3 border-2 border-pink-400 rounded-xl text-gray-800 placeholder:text-gray-400 placeholder:italic focus:border-pink-600 focus:text-pink-600 focus:placeholder-pink-300 hover:border-pink-500 outline-none shadow-sm focus:shadow-md transition duration-300 ease-in-out"
           required
         /></div>
 
          <div className="relative w-full mb-4">
-          <span className="absolute left-3 top-1/3 -translate-y-1/2 text-pink-500">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-500">
             <IconMail size={20} />
           </span>
         <input
@@ -100,12 +100,12 @@ export default function Register({
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full  mb-5 pl-10 p-3 border-2 border-pink-400 rounded-xl text-gray-800 placeholder:text-gray-400 placeholder:italic focus:border-pink-600 focus:text-pink-600 focus:placeholder-pink-300 hover:border-pink-500 outline-none shadow-sm focus:shadow-md transition duration-300 ease-in-out"
+          className="w-full   pl-10 p-3 border-2 border-pink-400 rounded-xl text-gray-800 placeholder:text-gray-400 placeholder:italic focus:border-pink-600 focus:text-pink-600 focus:placeholder-pink-300 hover:border-pink-500 outline-none shadow-sm focus:shadow-md transition duration-300 ease-in-out"
           required
         /></div>
 
           <div className="relative w-full mb-4">
-          <span className="absolute left-3 top-1/3 -translate-y-1/2 text-pink-500">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-500">
             <IconLock size={20} />
          
           </span>
@@ -114,13 +114,13 @@ export default function Register({
           placeholder="Senha"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full  mb-5 pl-10 p-3 border-2 border-pink-400 rounded-xl text-gray-800 placeholder:text-gray-400 placeholder:italic focus:border-pink-600 focus:text-pink-600 focus:placeholder-pink-300 hover:border-pink-500 outline-none shadow-sm focus:shadow-md transition duration-300 ease-in-out"
+          className="w-full   pl-10 p-3 border-2 border-pink-400 rounded-xl text-gray-800 placeholder:text-gray-400 placeholder:italic focus:border-pink-600 focus:text-pink-600 focus:placeholder-pink-300 hover:border-pink-500 outline-none shadow-sm focus:shadow-md transition duration-300 ease-in-out"
           required
         /></div>
 
 
   <div className="relative w-full mb-4">
-          <span className="absolute left-3 top-1/3 -translate-y-1/2 text-pink-500">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-500">
             <IconLock size={20} />
           </span>
 
@@ -129,7 +129,7 @@ export default function Register({
           placeholder="Confirme a senha"
           value={confirmpassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full  mb-5 pl-10 p-3 border-2 border-pink-400 rounded-xl text-gray-800 placeholder:text-gray-400 placeholder:italic focus:border-pink-600 focus:text-pink-600 focus:placeholder-pink-300 hover:border-pink-500 outline-none shadow-sm focus:shadow-md transition duration-300 ease-in-out"
+          className="w-full  pl-10 p-3 border-2 border-pink-400 rounded-xl text-gray-800 placeholder:text-gray-400 placeholder:italic focus:border-pink-600 focus:text-pink-600 focus:placeholder-pink-300 hover:border-pink-500 outline-none shadow-sm focus:shadow-md transition duration-300 ease-in-out"
         /></div>
 
         <button
