@@ -1,13 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ContainerPages from "../ui/ContainerPages";
 import Cabecalho from "../ui/Cabecalho";
 import Cardprogresso from "../ui/Cardprogresso";
 import StatusCard from "../ui/StatusCard ";
 import GrayMenu from "../ui/GrayMenu";
-import { Target, Dumbbell, FireExtinguisherIcon, Plus, Trash2, CheckCircle, Clock, Dumbbell as Muscle, X } from "lucide-react";
+import { 
+  Target, 
+  Dumbbell, 
+  Flame, 
+  Plus, 
+  Trash2, 
+  CheckCircle, 
+  Clock, 
+  Dumbbell as Muscle, 
+  X 
+} from "lucide-react";
 
+// --- Interface do Treino ---
 interface Treino {
   id: string;
   nome: string;
@@ -39,32 +50,53 @@ export default function Treino() {
   const [novoNomeTreino, setNovoNomeTreino] = useState("");
   const [novoExercicio, setNovoExercicio] = useState("");
   const [listaTempExercicio, setListaTempExercicio] = useState<string[]>([]);
+  
+  // Ref para controlar se já carregamos os dados iniciais e evitar sobrescrita
+  const isInitialRender = useRef(true);
 
+  // 1. CARREGAR (Roda apenas uma vez ao montar o componente)
   useEffect(() => {
-    const saved = localStorage.getItem("fichas_treino");
-    if (saved && JSON.parse(saved).length > 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setFichas(JSON.parse(saved));
-    } else {
+    try {
+      const saved = localStorage.getItem("fichas_treino_v2");
+      if (saved) {
+        const parsed = JSON.parse(saved) as Treino[];
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setFichas(parsed);
+        } else {
+          setFichas(TREINOS_PADRAO);
+        }
+      } else {
+        setFichas(TREINOS_PADRAO);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar treinos:", error);
       setFichas(TREINOS_PADRAO);
+    } finally {
+      // Libera para salvar após o carregamento inicial
+      isInitialRender.current = false;
     }
   }, []);
 
+  // 2. SALVAR (Roda sempre que a lista de fichas mudar)
   useEffect(() => {
-    localStorage.setItem("fichas_treino", JSON.stringify(fichas));
+    if (!isInitialRender.current) {
+      localStorage.setItem("fichas_treino_v2", JSON.stringify(fichas));
+    }
   }, [fichas]);
 
+  // --- Funções de Ação ---
   const adicionarExercicioParaLista = () => {
     if (!novoExercicio.trim()) return;
-    setListaTempExercicio([...listaTempExercicio, novoExercicio]);
+    setListaTempExercicio(prev => [...prev, novoExercicio.trim()]);
     setNovoExercicio("");
   };
 
   const salvarNovoTreino = () => {
-    if (!novoNomeTreino || listaTempExercicio.length === 0) {
+    if (!novoNomeTreino.trim() || listaTempExercicio.length === 0) {
       alert("Dê um nome ao treino e adicione pelo menos um exercício! ✨");
       return;
     }
+
     const novaFicha: Treino = {
       id: Date.now().toString(),
       nome: novoNomeTreino,
@@ -72,22 +104,30 @@ export default function Treino() {
       duracao: "45 min",
       exercicios: listaTempExercicio
     };
-    setFichas([novaFicha, ...fichas]);
+
+    setFichas(prev => [novaFicha, ...prev]);
     setNovoNomeTreino("");
     setListaTempExercicio([]);
     setActive("MeusTreinos");
   };
 
+  const excluirTreino = (id: string) => {
+    if (confirm("Deseja excluir este treino permanentemente? 💪")) {
+      setFichas(prev => prev.filter(f => f.id !== id));
+    }
+  };
+
   return (
     <ContainerPages>
       <Cabecalho title="Treino 💪" imageSrc="/images/hello-kitty-fitness.jpg">
-        <p>Acompanhe seu progresso e queime calorias ✨</p>
+        <p>Acompanhe seu progresso e mantenha o foco! ✨</p>
       </Cabecalho>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 mt-4 gap-4">
-        <Cardprogresso title="Fichas" progressoDodia="ativas" porcentagem={fichas.length} icon={<Dumbbell size={15} />} />
+      {/* Cards de Resumo */}
+      <div className="grid grid-cols-2 md:grid-cols-4 mt-4 gap-[0.6em] md:gap-4">
+        <Cardprogresso title="Fichas" progressoDodia="ativas" porcentagem={fichas.length.toString()} icon={<Muscle size={15} />} />
         <Cardprogresso title="Hoje" progressoDodia="status" porcentagem="Pendente" icon={<Target size={15} />} />
-        <Cardprogresso title="Sequência" progressoDodia="dias" porcentagem="12" icon={<FireExtinguisherIcon size={15} />} />
+        <Cardprogresso title="Sequência" progressoDodia="dias" porcentagem="12" icon={<Flame size={15} className="text-orange-400" />} />
         <Cardprogresso title="Kcal" progressoDodia="estimadas" porcentagem="320" icon={<Clock size={15} />} />
       </div>
 
@@ -100,23 +140,26 @@ export default function Treino() {
       </div>
 
       <div className="mt-6">
+        {/* --- ABA HOJE --- */}
         {active === "Hoje" && (
           <div className="space-y-4">
-            <h2 className="text-pink-500 font-bold flex items-center gap-2 px-1"><Clock size={18} /> Treinos de Hoje</h2>
+            <h2 className="text-pink-500 font-bold flex items-center gap-2 px-1 text-sm uppercase tracking-wider"><Clock size={18} /> Treinos Disponíveis</h2>
             <div className="grid gap-4">
               {fichas.map((treino) => (
-                <div key={treino.id} className="bg-white border-2 border-pink-100 rounded-2xl p-5 shadow-sm">
-                  <div className="flex justify-between items-start mb-3">
+                <div key={treino.id} className="bg-white border-2 border-pink-100 rounded-3xl p-6 shadow-sm">
+                  <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 className="font-bold text-gray-800 text-lg">{treino.nome}</h3>
-                      <p className="text-xs text-pink-400 font-medium">{treino.categoria} • {treino.duracao}</p>
+                      <h3 className="font-bold text-gray-800 text-lg leading-tight">{treino.nome}</h3>
+                      <p className="text-xs text-pink-400 font-bold uppercase tracking-tighter mt-1">{treino.categoria} • {treino.duracao}</p>
                     </div>
-                    <button className="bg-pink-500 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-pink-100">Concluir</button>
+                    <button className="bg-pink-500 text-white px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-pink-100 active:scale-95 transition-all">
+                      Concluir
+                    </button>
                   </div>
-                  <div className="bg-pink-50/50 rounded-xl p-3 flex flex-wrap gap-x-4 gap-y-1">
+                  <div className="bg-pink-50/50 rounded-2xl p-4 flex flex-wrap gap-x-5 gap-y-2">
                     {treino.exercicios.map((ex, i) => (
-                      <span key={i} className="text-sm text-gray-600 flex items-center gap-1">
-                        <span className="w-1 h-1 bg-pink-400 rounded-full"></span> {ex}
+                      <span key={i} className="text-sm text-gray-600 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-pink-400 rounded-full"></div> {ex}
                       </span>
                     ))}
                   </div>
@@ -126,21 +169,30 @@ export default function Treino() {
           </div>
         )}
 
+        {/* --- ABA MEUS TREINOS --- */}
         {active === "MeusTreinos" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {fichas.map((treino) => (
-              <div key={treino.id} className="bg-white p-5 rounded-2xl border-2 border-pink-100 relative group">
-                <button onClick={() => setFichas(fichas.filter(f => f.id !== treino.id))} className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-all"><Trash2 size={18} /></button>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 bg-pink-100 text-pink-500 rounded-xl"><Muscle size={24} /></div>
+              <div key={treino.id} className="bg-white p-6 rounded-[2rem] border-2 border-pink-50 relative group hover:border-pink-200 transition-all">
+                <button 
+                  onClick={() => excluirTreino(treino.id)} 
+                  className="absolute top-5 right-5 text-gray-300 hover:text-red-500 transition-all"
+                >
+                  <Trash2 size={18} />
+                </button>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="p-3 bg-pink-50 text-pink-500 rounded-2xl"><Muscle size={24} /></div>
                   <div>
-                    <h3 className="text-lg font-bold text-gray-800">{treino.nome}</h3>
-                    <p className="text-xs text-gray-400">{treino.duracao}utos totais</p>
+                    <h3 className="font-bold text-gray-800">{treino.nome}</h3>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase">{treino.duracao}</p>
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 mt-4">
                   {treino.exercicios.map((ex, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 p-2 rounded-lg"><CheckCircle size={14} className="text-pink-300" />{ex}</div>
+                    <div key={i} className="flex items-center gap-3 text-sm text-gray-600 bg-pink-50/30 p-2.5 rounded-xl border border-pink-50">
+                      <CheckCircle size={14} className="text-pink-300" />
+                      {ex}
+                    </div>
                   ))}
                 </div>
               </div>
@@ -148,26 +200,59 @@ export default function Treino() {
           </div>
         )}
 
+        {/* --- ABA CRIAR TREINO --- */}
         {active === "CriarTreinos" && (
-          <StatusCard title="Novo Treino Customizado" icon={<Plus size={20} />}>
-            <div className="space-y-5">
-              <input placeholder="Ex: Treino de Braços" value={novoNomeTreino} onChange={(e) => setNovoNomeTreino(e.target.value)} className="w-full p-3 bg-pink-50/50 border-2 border-pink-100 rounded-xl outline-none focus:border-pink-400" />
-              <div className="p-4 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+          <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border-2 border-pink-50 max-w-2xl mx-auto">
+            <h3 className="text-xl font-black text-pink-500 mb-6 flex items-center gap-2 uppercase tracking-tight">
+              <Plus size={24} /> Novo Treino Customizado
+            </h3>
+            <div className="space-y-6">
+              <div className="space-y-1">
+                <label className="text-[10px] font-black text-gray-400 uppercase ml-2">Nome da Ficha</label>
+                <input 
+                  placeholder="Ex: Treino de Superiores 🌸" 
+                  value={novoNomeTreino} 
+                  onChange={(e) => setNovoNomeTreino(e.target.value)} 
+                  className="w-full p-4 bg-pink-50/50 border-2 border-transparent focus:border-pink-200 rounded-2xl outline-none transition-all" 
+                />
+              </div>
+
+              <div className="p-5 bg-gray-50/50 rounded-[2rem] border-2 border-dashed border-gray-200">
+                <label className="text-[10px] font-black text-gray-400 mb-2 block uppercase ml-1">Adicionar Exercícios</label>
                 <div className="flex gap-2">
-                  <input placeholder="Nome do exercício" value={novoExercicio} onChange={(e) => setNovoExercicio(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && adicionarExercicioParaLista()} className="flex-1 p-2 rounded-lg border border-gray-200 outline-none" />
-                  <button onClick={adicionarExercicioParaLista} className="bg-pink-500 text-white p-2 rounded-lg"><Plus size={20} /></button>
+                  <input 
+                    placeholder="Nome do exercício..." 
+                    value={novoExercicio} 
+                    onChange={(e) => setNovoExercicio(e.target.value)} 
+                    onKeyPress={(e) => e.key === 'Enter' && adicionarExercicioParaLista()} 
+                    className="flex-1 p-3 rounded-xl border border-gray-200 outline-none focus:border-pink-300 transition-all" 
+                  />
+                  <button 
+                    onClick={adicionarExercicioParaLista} 
+                    className="bg-pink-500 text-white p-3 rounded-xl hover:bg-pink-600 shadow-md shadow-pink-100"
+                  >
+                    <Plus size={20} />
+                  </button>
                 </div>
+                
                 <div className="mt-4 flex flex-wrap gap-2">
                   {listaTempExercicio.map((ex, index) => (
-                    <span key={index} className="flex items-center gap-2 bg-white px-3 py-1 rounded-full border border-pink-200 text-sm text-pink-600 font-medium">
-                      {ex} <X size={14} className="cursor-pointer" onClick={() => setListaTempExercicio(listaTempExercicio.filter((_, i) => i !== index))} />
+                    <span key={index} className="flex items-center gap-2 bg-white px-3 py-2 rounded-full border border-pink-200 text-xs text-pink-600 font-bold">
+                      {ex} 
+                      <X size={14} className="cursor-pointer hover:text-red-500" onClick={() => setListaTempExercicio(listaTempExercicio.filter((_, i) => i !== index))} />
                     </span>
                   ))}
                 </div>
               </div>
-              <button onClick={salvarNovoTreino} className="w-full py-4 bg-pink-500 text-white rounded-2xl font-bold shadow-lg shadow-pink-100">Criar Treino Agora 💪</button>
+              
+              <button 
+                onClick={salvarNovoTreino} 
+                className="w-full py-5 bg-pink-500 text-white rounded-[1.5rem] font-black shadow-lg shadow-pink-200 hover:bg-pink-600 active:scale-95 transition-all uppercase tracking-widest text-sm"
+              >
+                Criar Treino 💪
+              </button>
             </div>
-          </StatusCard>
+          </div>
         )}
       </div>
     </ContainerPages>
