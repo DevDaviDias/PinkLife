@@ -1,201 +1,264 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import ContainerPages from "../ui/ContainerPages";
-import Cabecalho from "../ui/Cabecalho";
-import Cardprogresso from "../ui/Cardprogresso";
-import GrayMenu from "@/componentes/ui/GrayMenu";
+import { useState, useEffect, useRef, ReactNode } from "react";
 import { 
-  Droplets, 
-  Calendar as CalendarIcon, 
-  Activity, 
-  Heart, 
-  Plus, 
-  Trash2 
+  format, addMonths, subMonths, startOfMonth, endOfMonth, 
+  startOfWeek, endOfWeek, isSameMonth, addDays, parseISO 
+} from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  ChevronLeft, ChevronRight, X, Thermometer, Droplets, 
+  Brain, Wind, Smile, Sparkles
 } from "lucide-react";
 
-interface RegistroCiclo {
-  id: string;
-  dataInicio: string;
-  duracao: number;
-  sintomas: string[];
+import ContainerPages from "../ui/ContainerPages";
+import Cabecalho from "../ui/Cabecalho";
+import GrayMenu from "@/componentes/ui/GrayMenu";
+
+// --- Interfaces de Dados ---
+interface Sintomas {
+  dorDeCabeca: boolean;
+  colica: boolean;
+  inchaco: boolean;
+  seiosSensiveis: boolean;
+  humorInstavel: boolean;
+}
+
+interface RegistroDia {
+  data: string;
+  menstruando: boolean;
+  sintomas: Sintomas;
+  notas: string;
+}
+
+// --- Interfaces de Props para Subcomponentes ---
+interface CalendarioProps {
+  currentMonth: Date;
+  registros: Record<string, RegistroDia>;
+  onSelect: (data: string) => void;
+}
+
+interface ModalSintomasProps {
+  dia: string | null;
+  registros: Record<string, RegistroDia>;
+  onClose: () => void;
+  onUpdate: (data: string, updates: Partial<RegistroDia>) => void;
+}
+
+interface SintomaBotaoProps {
+  label: string;
+  icon: ReactNode;
+  active: boolean | undefined;
+  onClick: () => void;
+  color: "amber" | "purple" | "blue" | "green";
 }
 
 export default function Saude() {
-  const [active, setActive] = useState("Ciclo");
-  const isLoaded = useRef(false); // Nosso "cadeado" para o salvamento
+  const [active, setActive] = useState("Calendário");
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [registros, setRegistros] = useState<Record<string, RegistroDia>>({});
+  const [diaSelecionado, setDiaSelecionado] = useState<string | null>(null);
+  const isLoaded = useRef(false);
 
-  const [registros, setRegistros] = useState<RegistroCiclo[]>([]);
-  const [coposAgua, setCoposAgua] = useState(0);
+  const [analisando, setAnalisando] = useState(false);
+  const [relatorioIA, setRelatorioIA] = useState<string | null>(null);
 
-  // Estados para novo registro
-  const [dataInicio, setDataInicio] = useState("");
-  const [duracao, setDuracao] = useState("5");
-
-  // 1. CARREGAR DADOS (Executa apenas 1 vez ao abrir a página)
   useEffect(() => {
-    const savedCiclo = localStorage.getItem("saude_ciclo");
-    const savedAgua = localStorage.getItem("saude_agua_hoje");
-    
-    if (savedCiclo) setRegistros(JSON.parse(savedCiclo));
-    if (savedAgua) setCoposAgua(parseInt(savedAgua));
-    
-    // Após carregar tudo, abrimos o cadeado para permitir salvamentos
+    const saved = localStorage.getItem("saude_v5_pro");
+    if (saved) setRegistros(JSON.parse(saved));
     isLoaded.current = true;
   }, []);
 
-  // 2. SALVAR DADOS (Executa sempre que registros ou coposAgua mudarem)
   useEffect(() => {
-    // SÓ SALVA SE O CARREGAMENTO JÁ TIVER SIDO CONCLUÍDO
-    if (isLoaded.current) {
-      localStorage.setItem("saude_ciclo", JSON.stringify(registros));
-      localStorage.setItem("saude_agua_hoje", coposAgua.toString());
-    }
-  }, [registros, coposAgua]);
+    if (isLoaded.current) localStorage.setItem("saude_v5_pro", JSON.stringify(registros));
+  }, [registros]);
 
-  const adicionarCiclo = () => {
-    if (!dataInicio) return;
-    const novo: RegistroCiclo = {
-      id: Date.now().toString(),
-      dataInicio,
-      duracao: parseInt(duracao),
-      sintomas: []
-    };
-    setRegistros([novo, ...registros]);
-    setDataInicio("");
+  const atualizarDia = (data: string, updates: Partial<RegistroDia>) => {
+    setRegistros(prev => {
+      const diaAtual = prev[data] || { 
+        data, menstruando: false, notas: "", 
+        sintomas: { dorDeCabeca: false, colica: false, inchaco: false, seiosSensiveis: false, humorInstavel: false } 
+      };
+      return { ...prev, [data]: { ...diaAtual, ...updates } };
+    });
   };
 
-  const deletarCiclo = (id: string) => {
-    setRegistros(registros.filter(r => r.id !== id));
+  const gerarAnaliseIA = () => {
+    setAnalisando(true);
+    setTimeout(() => {
+      const lista = Object.values(registros);
+      let msg = "Com base nos seus dados de fluxo e sintomas, seu ciclo demonstra regularidade. ";
+      if (lista.filter(r => r.sintomas.colica).length > 3) msg += "Notei cólicas frequentes; considere monitorar a intensidade.";
+      setRelatorioIA(msg);
+      setAnalisando(false);
+    }, 2000);
   };
 
   return (
     <ContainerPages>
-      <Cabecalho title="Saúde 🩺" imageSrc="/images/hello-kitty-health.jpg">
-        <p>Cuide de você com carinho e organização ✨</p>
-      </Cabecalho>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-        <Cardprogresso 
-          title="Água" 
-          icon={<Droplets size={20} className="text-blue-400" />} 
-          progressoDodia={`${coposAgua}/8 copos`} 
-          progresso={(coposAgua / 8) * 100}
-          barraDeProgresso={true}
-        />
-        <Cardprogresso 
-          title="Último Ciclo" 
-          icon={<CalendarIcon size={20} className="text-pink-400" />} 
-          porcentagem={registros[0]?.dataInicio.split('-').reverse().slice(0,2).join('/') || "--"} 
-        />
-        <Cardprogresso 
-          title="Status" 
-          icon={<Heart size={20} className="text-red-400" />} 
-          porcentagem="Bem-estar" 
-        />
+      <div className="-mt-4">
+        <Cabecalho title="Saúde Pro 🌸">
+          <p className="text-sm">Seu diário inteligente</p>
+        </Cabecalho>
       </div>
 
-      <GrayMenu items={[
-        { title: "Ciclo", onClick: () => setActive("Ciclo"), active: active === "Ciclo" },
-        { title: "Hidratação", onClick: () => setActive("Agua"), active: active === "Agua" },
-        { title: "Sintomas", onClick: () => setActive("Sintomas"), active: active === "Sintomas" },
-      ]} />
+      <div className="mt-4">
+        <GrayMenu items={[
+          { title: "Calendário", onClick: () => setActive("Calendário"), active: active === "Calendário" },
+          { title: "Histórico", onClick: () => setActive("Histórico"), active: active === "Histórico" },
+          { title: "Análise IA", onClick: () => setActive("Análise"), active: active === "Análise" },
+        ]} />
+      </div>
 
-      <div className="mt-6">
-        {active === "Ciclo" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white p-6 rounded-[2rem] border-2 border-pink-50 shadow-sm">
-              <h3 className="font-bold text-pink-500 mb-4 flex items-center gap-2 uppercase text-sm">
-                <Plus size={18} /> Registrar Período
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase ml-1">Data de Início</label>
-                  <input 
-                    type="date" 
-                    value={dataInicio} 
-                    onChange={(e) => setDataInicio(e.target.value)}
-                    className="w-full p-3 bg-pink-50/50 rounded-xl outline-none border border-pink-100 mt-1" 
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase ml-1">Duração (dias)</label>
-                  <input 
-                    type="number" 
-                    value={duracao} 
-                    onChange={(e) => setDuracao(e.target.value)}
-                    className="w-full p-3 bg-pink-50/50 rounded-xl outline-none border border-pink-100 mt-1" 
-                  />
-                </div>
-                <button 
-                  onClick={adicionarCiclo}
-                  className="w-full py-4 bg-pink-400 text-white rounded-2xl font-bold shadow-lg shadow-pink-100 hover:bg-pink-500 transition-all"
-                >
-                  Salvar Registro 🌸
-                </button>
-              </div>
-            </div>
+      <div className="mt-6 mb-24">
+        {active === "Calendário" && (
+           <div className="max-w-xl mx-auto px-1">
+             <div className="flex justify-between items-center mb-4">
+               <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-1 text-pink-400"><ChevronLeft /></button>
+               <h3 className="font-bold text-gray-700 uppercase text-xs tracking-widest">{format(currentMonth, "MMMM yyyy", { locale: ptBR })}</h3>
+               <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-1 text-pink-400"><ChevronRight /></button>
+             </div>
+             <Calendario currentMonth={currentMonth} registros={registros} onSelect={setDiaSelecionado} />
+           </div>
+        )}
 
-            <div className="bg-white p-6 rounded-[2rem] border-2 border-pink-50 shadow-sm">
-              <h3 className="font-bold text-gray-700 mb-4 flex items-center gap-2 uppercase text-sm">
-                <Activity size={18} className="text-pink-400" /> Histórico
-              </h3>
-              <div className="space-y-3">
-                {registros.map(reg => (
-                  <div key={reg.id} className="flex justify-between items-center p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                    <div>
-                      <p className="font-bold text-gray-700">{reg.dataInicio.split('-').reverse().join('/')}</p>
-                      <p className="text-xs text-gray-400">{reg.duracao} dias de duração</p>
-                    </div>
-                    <button onClick={() => deletarCiclo(reg.id)} className="text-gray-300 hover:text-red-400">
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                ))}
-              </div>
+        {active === "Histórico" && (
+          <div className="max-w-2xl mx-auto px-2 overflow-hidden">
+            <div className="bg-white rounded-[2rem] border border-pink-100 overflow-hidden shadow-sm">
+              <table className="w-full text-left border-collapse">
+                <thead className="bg-pink-50">
+                  <tr>
+                    <th className="p-4 text-[10px] font-black text-pink-400 uppercase">Data</th>
+                    <th className="p-4 text-[10px] font-black text-pink-400 uppercase text-center">Fluxo</th>
+                    <th className="p-4 text-[10px] font-black text-pink-400 uppercase">Sintomas/Notas</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {Object.values(registros)
+                    .sort((a, b) => b.data.localeCompare(a.data))
+                    .map((reg) => (
+                      <tr key={reg.data} className="active:bg-gray-50 transition-colors cursor-pointer" onClick={() => setDiaSelecionado(reg.data)}>
+                        <td className="p-4">
+                          <span className="text-xs font-bold text-gray-700">{format(parseISO(reg.data), "dd/MM")}</span>
+                        </td>
+                        <td className="p-4 text-center">
+                          {reg.menstruando && <Droplets size={16} className="text-pink-500 mx-auto" />}
+                        </td>
+                        <td className="p-4">
+                          <div className="flex flex-wrap gap-1 mb-1">
+                            {reg.sintomas.colica && <div className="w-2 h-2 rounded-full bg-amber-400" />}
+                            {reg.sintomas.dorDeCabeca && <div className="w-2 h-2 rounded-full bg-purple-400" />}
+                            {reg.sintomas.inchaco && <div className="w-2 h-2 rounded-full bg-blue-400" />}
+                            {reg.sintomas.humorInstavel && <div className="w-2 h-2 rounded-full bg-green-400" />}
+                          </div>
+                          {reg.notas && <p className="text-[10px] text-gray-400 italic line-clamp-1">{reg.notas}</p>}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
 
-        {active === "Agua" && (
-          <div className="bg-white p-10 rounded-[3rem] border-2 border-blue-50 text-center max-w-md mx-auto shadow-sm">
-             <div className="relative inline-block mb-6">
-                <Droplets size={80} className="text-blue-400 animate-bounce" />
+        {active === "Análise" && (
+          <div className="max-w-xl mx-auto px-4 text-center">
+             <div className="bg-white p-8 rounded-[3rem] border-2 border-purple-100">
+                <Sparkles size={30} className="mx-auto mb-4 text-purple-400" />
+                {analisando ? <p className="text-xs animate-pulse">Processando...</p> : 
+                 relatorioIA ? <p className="text-sm text-purple-900">{relatorioIA}</p> : 
+                 <button onClick={gerarAnaliseIA} className="w-full py-4 bg-purple-600 text-white rounded-2xl font-black">Gerar Análise</button>}
              </div>
-             <h3 className="text-2xl font-black text-blue-500 mb-2">Bebeu água hoje?</h3>
-             <p className="text-gray-400 text-sm mb-8">Mantenha sua pele e saúde radiantes! 💎</p>
-             
-             <div className="flex justify-center gap-4 mb-8">
-                {[...Array(8)].map((_, i) => (
-                  <div 
-                    key={i} 
-                    onClick={() => setCoposAgua(i + 1)}
-                    className={`w-8 h-12 rounded-b-lg border-2 cursor-pointer transition-all ${i < coposAgua ? 'bg-blue-400 border-blue-500' : 'bg-gray-50 border-gray-200'}`}
-                  ></div>
-                ))}
-             </div>
-
-             <div className="flex gap-4">
-               <button onClick={() => setCoposAgua(0)} className="flex-1 py-3 bg-gray-100 text-gray-400 rounded-xl font-bold">Zerar</button>
-               <button onClick={() => setCoposAgua(prev => Math.min(prev + 1, 8))} className="flex-2 px-8 py-3 bg-blue-500 text-white rounded-xl font-bold shadow-lg shadow-blue-100">+ 1 Copo</button>
-             </div>
-          </div>
-        )}
-
-        {active === "Sintomas" && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-             {["Cólica", "Dor de Cabeça", "Inchaço", "Cansaço", "Humor Instável", "Pele Oleosa", "Desejo Doces", "Sono"].map(sintoma => (
-               <button key={sintoma} className="p-6 bg-white border-2 border-pink-50 rounded-[2rem] hover:border-pink-300 transition-all text-center group">
-                  <div className="w-12 h-12 bg-pink-50 rounded-full mx-auto mb-3 flex items-center justify-center text-pink-500 group-hover:bg-pink-500 group-hover:text-white transition-all">
-                    <Heart size={20} />
-                  </div>
-                  <span className="text-xs font-bold text-gray-600">{sintoma}</span>
-               </button>
-             ))}
           </div>
         )}
       </div>
+
+      <ModalSintomas 
+        dia={diaSelecionado} 
+        registros={registros} 
+        onClose={() => setDiaSelecionado(null)} 
+        onUpdate={atualizarDia} 
+      />
     </ContainerPages>
+  );
+}
+
+// --- Subcomponentes Tipados ---
+
+function Calendario({ currentMonth, registros, onSelect }: CalendarioProps) {
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(monthStart);
+  const startDate = startOfWeek(monthStart);
+  const endDate = endOfWeek(monthEnd);
+
+  const rows = [];
+  let days = [];
+  let day = startDate;
+
+  while (day <= endDate) {
+    for (let i = 0; i < 7; i++) {
+      const dStr = format(day, "yyyy-MM-dd");
+      const reg = registros[dStr];
+      const isCurrentMonth = isSameMonth(day, monthStart);
+
+      days.push(
+        <div key={dStr} onClick={() => onSelect(dStr)} className={`aspect-square p-0.5 relative cursor-pointer border-[0.5px] border-pink-50/30 flex flex-col items-center justify-center ${!isCurrentMonth ? "opacity-10" : "opacity-100"}`}>
+          {reg?.menstruando && <div className="absolute inset-1.5 bg-pink-400 rounded-xl" />}
+          <span className={`relative text-xs font-bold z-10 ${reg?.menstruando ? "text-white" : "text-gray-500"}`}>{format(day, "d")}</span>
+        </div>
+      );
+      day = addDays(day, 1);
+    }
+    rows.push(<div className="grid grid-cols-7" key={day.getTime()}>{days}</div>);
+    days = [];
+  }
+  return <div className="bg-white rounded-3xl overflow-hidden border border-pink-100">{rows}</div>;
+}
+
+function ModalSintomas({ dia, registros, onClose, onUpdate }: ModalSintomasProps) {
+  if (!dia) return null;
+  const reg = registros[dia];
+
+  return (
+    <AnimatePresence>
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} className="relative bg-white w-full max-w-lg rounded-t-[2.5rem] p-6 shadow-2xl">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-black">{format(parseISO(dia), "dd 'de' MMMM", { locale: ptBR })}</h2>
+            <button onClick={onClose} className="p-2 bg-gray-50 rounded-full"><X size={20}/></button>
+          </div>
+          <div className="space-y-4">
+             <button onClick={() => onUpdate(dia, { menstruando: !reg?.menstruando })} className={`w-full p-4 rounded-2xl border-2 flex justify-between items-center ${reg?.menstruando ? 'border-pink-400 bg-pink-50' : 'border-gray-50'}`}>
+                <span className="font-bold text-sm flex items-center gap-2"><Droplets size={18} className="text-pink-500"/> Fluxo Menstrual</span>
+                <div className={`w-4 h-4 rounded-full ${reg?.menstruando ? 'bg-pink-400' : 'bg-gray-200'}`} />
+             </button>
+             <div className="grid grid-cols-2 gap-2">
+                <SintomaBotao label="Cólica" icon={<Thermometer size={14}/>} active={reg?.sintomas?.colica} onClick={() => onUpdate(dia, { sintomas: { ...reg?.sintomas, colica: !reg?.sintomas?.colica } })} color="amber" />
+                <SintomaBotao label="Cabeça" icon={<Brain size={14}/>} active={reg?.sintomas?.dorDeCabeca} onClick={() => onUpdate(dia, { sintomas: { ...reg?.sintomas, dorDeCabeca: !reg?.sintomas?.dorDeCabeca } })} color="purple" />
+                <SintomaBotao label="Inchaço" icon={<Wind size={14}/>} active={reg?.sintomas?.inchaco} onClick={() => onUpdate(dia, { sintomas: { ...reg?.sintomas, inchaco: !reg?.sintomas?.inchaco } })} color="blue" />
+                <SintomaBotao label="Humor" icon={<Smile size={14}/>} active={reg?.sintomas?.humorInstavel} onClick={() => onUpdate(dia, { sintomas: { ...reg?.sintomas, humorInstavel: !reg?.sintomas?.humorInstavel } })} color="green" />
+             </div>
+             <textarea placeholder="Notas..." value={reg?.notas || ""} onChange={(e) => onUpdate(dia, { notas: e.target.value })} className="w-full p-4 bg-gray-50 rounded-2xl text-xs min-h-[80px] outline-none" />
+          </div>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
+}
+
+function SintomaBotao({ label, icon, active, onClick, color }: SintomaBotaoProps) {
+  const colors = {
+    amber: active ? "border-amber-400 bg-amber-50 text-amber-700" : "border-gray-100 text-gray-400",
+    purple: active ? "border-purple-400 bg-purple-50 text-purple-700" : "border-gray-100 text-gray-400",
+    blue: active ? "border-blue-400 bg-blue-50 text-blue-700" : "border-gray-100 text-gray-400",
+    green: active ? "border-green-400 bg-green-50 text-green-700" : "border-gray-100 text-gray-400",
+  };
+  return (
+    <button onClick={onClick} className={`p-3 rounded-xl border-2 flex items-center gap-2 text-[10px] font-black uppercase transition-all ${colors[color]}`}>
+      {icon} {label}
+    </button>
   );
 }
