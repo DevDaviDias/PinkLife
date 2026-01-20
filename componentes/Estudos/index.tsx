@@ -142,7 +142,7 @@ export default function Estudos() {
               <input placeholder="Nome da matéria" value={nome} onChange={(e) => setNome(e.target.value)} className="border p-2 rounded" />
               <input placeholder="Meta de horas" type="number" value={metaHoras} onChange={(e) => setMetaHoras(e.target.value)} className="border p-2 rounded" />
             </div>
-            <button onClick={adicionarMateria} className="mt-9 bg-pink-500 text-white px-6 py-3 rounded hover:bg-pink-600 transition-colors">
+            <button onClick={adicionarMateria} className="md:mt-9 bg-pink-500 text-white px-6 py-3 rounded hover:bg-pink-600 transition-colors">
               + Nova Matéria
             </button>
 

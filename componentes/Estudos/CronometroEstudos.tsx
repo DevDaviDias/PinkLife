@@ -58,7 +58,7 @@ export default function CronometroEstudos({
   const cronometroBloqueado = materia === "";
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1">
       {/* Aviso caso não tenha matéria selecionada */}
       {cronometroBloqueado && (
         <div className="flex items-center gap-2 text-xs text-pink-400 justify-center animate-pulse">
