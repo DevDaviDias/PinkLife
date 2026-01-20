@@ -80,7 +80,7 @@ export default function Agenda() {
               </div>
             </div>
           ) : (
-            // LISTA REAL
+          
             lembretes.map((item) => (
               <div key={item.id} className="group flex items-center justify-between p-3 bg-pink-300/10 rounded-lg hover:bg-pink-300/20 transition-all border border-pink-100/10">
                 <div className="flex items-center gap-3">
