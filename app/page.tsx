@@ -1,6 +1,11 @@
+// app/page.tsx
 import AuthGate from "@/componentes/AuthGate";
-export default function home(){
-  return(
-    <AuthGate/>
-  )
+import { UserProvider } from "@/componentes/context/UserContext";
+
+export default function Home() {
+  return (
+    <UserProvider>
+      <AuthGate />
+    </UserProvider>
+  );
 }

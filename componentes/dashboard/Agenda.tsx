@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import StatusCard from "../ui/StatusCard ";
+import StatusCard from "@/componentes/ui/StatusCard ";
 import { Calendar, Plus, Trash2, X, BellRing } from "lucide-react";
+import { getLoggedUser } from "@/componentes/services/APIservices";
+import axios from "axios";
 
 interface ItemAgenda {
   id: number;
@@ -13,19 +15,52 @@ interface ItemAgenda {
 }
 
 export default function Agenda() {
-  const [lembretes, setLembretes] = useState<ItemAgenda[]>(() => {
-    const salvos = localStorage.getItem("agenda_lembretes");
-    return salvos ? JSON.parse(salvos) : [];
-  });
+  const [lembretes, setLembretes] = useState<ItemAgenda[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Estados do formulário
   const [novaDesc, setNovaDesc] = useState("");
   const [novaData, setNovaData] = useState("");
   const [novoHorario, setNovoHorario] = useState("");
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+  // --- Carregar lembretes do backend
+  useEffect(() => {
+    async function fetchAgenda() {
+      try {
+        const user = await getLoggedUser();
+        const agenda = user.progress?.agenda?.tarefas || [];
+        setLembretes(agenda);
+        localStorage.setItem("agenda_lembretes", JSON.stringify(agenda));
+      } catch (err) {
+        console.error("Erro ao buscar agenda", err);
+        // fallback para localStorage
+        const salvos = localStorage.getItem("agenda_lembretes");
+        if (salvos) setLembretes(JSON.parse(salvos));
+      }
+    }
+    fetchAgenda();
+  }, []);
+
+  // --- Atualiza localStorage e backend quando lembretes mudam
   useEffect(() => {
     localStorage.setItem("agenda_lembretes", JSON.stringify(lembretes));
+
+    async function saveAgenda() {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        await axios.post(
+          `${API_URL}/user/progress`,
+          { module: "agenda", data: { tarefas: lembretes } },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } catch (err) {
+        console.error("Erro ao salvar agenda no backend", err);
+      }
+    }
+
+    saveAgenda();
   }, [lembretes]);
 
   function adicionarLembrete() {
@@ -40,7 +75,9 @@ export default function Agenda() {
     };
 
     setLembretes((prev) => [novoItem, ...prev]);
-    setNovaDesc(""); setNovaData(""); setNovoHorario("");
+    setNovaDesc("");
+    setNovaData("");
+    setNovoHorario("");
     setIsModalOpen(false);
   }
 
@@ -63,8 +100,6 @@ export default function Agenda() {
         }
       >
         <div className="flex-1 overflow-y-auto pr-1 space-y-2 custom-scrollbar">
-          
-          {/* LÓGICA DO LEMBRETE DE EXEMPLO */}
           {lembretes.length === 0 ? (
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-3 p-3 bg-gray-100/50 rounded-lg border border-dashed border-gray-300 opacity-60">
@@ -80,7 +115,6 @@ export default function Agenda() {
               </div>
             </div>
           ) : (
-          
             lembretes.map((item) => (
               <div key={item.id} className="group flex items-center justify-between p-3 bg-pink-300/10 rounded-lg hover:bg-pink-300/20 transition-all border border-pink-100/10">
                 <div className="flex items-center gap-3">
@@ -104,10 +138,8 @@ export default function Agenda() {
         </div>
       </StatusCard>
 
-      {/* O Modal permanece o mesmo código anterior... */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-           {/* ... conteúdo do modal ... */}
            <div className="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-bold text-pink-500">Novo Lembrete 🎀</h3>

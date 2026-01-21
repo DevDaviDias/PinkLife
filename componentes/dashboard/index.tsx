@@ -8,17 +8,18 @@ import { BookOpen, Heart, Repeat, Target } from "lucide-react";
 import Cabecalho from "../ui/Cabecalho";
 import ContainerPages from "../ui/ContainerPages";
 import { useEffect, useState } from "react";
-import { getLoggedUser } from "@/componentes/services/APIservices";
+import { useUser } from "@/componentes/context/UserContext"; // <- contexto do usuário
 
 // --- Interfaces ---
 interface Materia { id: number; nome: string; metaHoras: number; horasEstudadas: number; }
 interface Treino { id: string; nome: string; }
 interface Habito { id: number; concluido: boolean; }
-interface Tarefa { id: string; concluida: boolean; }
+interface Tarefa { id: number; concluida: boolean; }
 
 export default function Dashboard() {
-  const [userName, setUserName] = useState<string>("");
-  
+  const { user } = useUser(); // pega usuário do contexto
+  const userName = user?.name || "Bem-vinda";
+
   // Estados de Estatísticas
   const [estudosStats, setEstudosStats] = useState({ horasLabel: "0.0h / 0h", porcentagem: 0 });
   const [treinoStats, setTreinoStats] = useState({ label: "Nenhum treino", porcentagem: 0, totalFichas: 0 });
@@ -26,66 +27,73 @@ export default function Dashboard() {
   const [tarefasStats, setTarefasStats] = useState({ label: "0 pendentes", porcentagem: 0 });
 
   useEffect(() => {
-    async function fetchUser() {
-      try {
-        const user = await getLoggedUser();
-        if (user?.name) setUserName(user.name);
-      } catch (err) {
-        console.error("Erro ao buscar usuário", err);
-      }
-    }
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
     const updateDashboardData = () => {
+      const progress = user?.progress?.dashboard;
+
       // 1. Estudos
-      const sMaterias = localStorage.getItem("materias");
-      const materias: Materia[] = sMaterias ? JSON.parse(sMaterias) : [];
+      const materias: Materia[] = progress?.treino?.exercicios
+        ? progress.treino.exercicios.map((nome, i) => ({
+            id: i,
+            nome,
+            metaHoras: 0,
+            horasEstudadas: 0,
+          }))
+        : [];
+
       const tHoras = materias.reduce((acc, m) => acc + (m.horasEstudadas || 0), 0);
       const tMeta = materias.reduce((acc, m) => acc + (m.metaHoras || 0), 0);
       setEstudosStats({
         horasLabel: `${tHoras.toFixed(1)}h / ${tMeta}h`,
-        porcentagem: tMeta > 0 ? Math.min((tHoras / tMeta) * 100, 100) : 0
+        porcentagem: tMeta > 0 ? Math.min((tHoras / tMeta) * 100, 100) : 0,
       });
 
       // 2. Treinos
-      const sTreinos = localStorage.getItem("fichas_treino_v2");
-      const treinos: Treino[] = sTreinos ? JSON.parse(sTreinos) : [];
+      const treinos: Treino[] = progress?.treino?.exercicios
+        ? progress.treino.exercicios.map((nome, i) => ({ id: i.toString(), nome }))
+        : [];
       setTreinoStats({
         label: treinos.length > 0 ? `${treinos.length} fichas` : "Nenhum treino",
         porcentagem: treinos.length > 0 ? 100 : 0,
-        totalFichas: treinos.length
+        totalFichas: treinos.length,
       });
 
       // 3. Hábitos
-      const sHabitos = localStorage.getItem("habitos_v2");
-      const habitos: Habito[] = sHabitos ? JSON.parse(sHabitos) : [];
+      const habitos: Habito[] = progress?.habitos
+        ? Object.entries(progress.habitos).map(([nome, value], i) => ({
+            id: i,
+            concluido: !!value,
+          }))
+        : [];
       const concluidosH = habitos.filter(h => h.concluido).length;
       setHabitosStats({
         label: `${concluidosH}/${habitos.length} concluídos`,
-        porcentagem: habitos.length > 0 ? (concluidosH / habitos.length) * 100 : 0
+        porcentagem: habitos.length > 0 ? (concluidosH / habitos.length) * 100 : 0,
       });
 
       // 4. Tarefas
-      const sTarefas = localStorage.getItem("tarefas_v1");
-      const tarefas: Tarefa[] = sTarefas ? JSON.parse(sTarefas) : [];
+      const tarefas: Tarefa[] = (progress?.agenda?.tarefas ?? []).map((t, i) => ({
+        id: i,
+        concluida: t.concluida ?? false,
+      }));
       const concluidasT = tarefas.filter(t => t.concluida).length;
       const pendentes = tarefas.length - concluidasT;
       setTarefasStats({
-        label: pendentes > 0 ? `${pendentes} pendentes` : (tarefas.length > 0 ? "Tudo feito! ✨" : "Sem tarefas"),
-        porcentagem: tarefas.length > 0 ? (concluidasT / tarefas.length) * 100 : 0
+        label:
+          pendentes > 0
+            ? `${pendentes} pendentes`
+            : tarefas.length > 0
+            ? "Tudo feito! ✨"
+            : "Sem tarefas",
+        porcentagem: tarefas.length > 0 ? (concluidasT / tarefas.length) * 100 : 0,
       });
     };
 
     updateDashboardData();
-    window.addEventListener("storage", updateDashboardData);
-    return () => window.removeEventListener("storage", updateDashboardData);
-  }, []);
+  }, [user]); // Recalcula quando o usuário for carregado
 
   return (
     <ContainerPages>
-      <Cabecalho title={`Olá, ${userName || "Bem-vinda"}! 🌸`} imageSrc={"/images/hello-kitty-dashboard.jpg"}>
+      <Cabecalho title={`Olá, ${userName}! 🌸`} imageSrc={"/images/hello-kitty-dashboard.jpg"}>
         <DateComponent />
       </Cabecalho>
 
@@ -119,7 +127,12 @@ export default function Dashboard() {
           progressoDodia={treinoStats.label}
           progresso={treinoStats.porcentagem}
           barraDeProgresso={true}
-          icon={<Heart size={20} className={treinoStats.totalFichas > 0 ? "text-pink-500 fill-pink-500" : ""} />}
+          icon={
+            <Heart
+              size={20}
+              className={treinoStats.totalFichas > 0 ? "text-pink-500 fill-pink-500" : ""}
+            />
+          }
         />
       </div>
 
