@@ -29,5 +29,8 @@ export async function getLoggedUser() {
     },
   });
 
-  return response.data.user; // retorna { name, email, ... }
+  // RETORNAR DIRETO O OBJETO USER
+  return response.data; // <-- sem .user
 }
+
+
