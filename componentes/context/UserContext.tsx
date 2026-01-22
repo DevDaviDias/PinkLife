@@ -3,32 +3,44 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { getLoggedUser } from "@/componentes/services/APIservices";
 
-// --- 1. Definição de Interfaces Específicas (Contratos de Dados) ---
+// --- 1. Definição de Interfaces Específicas ---
 
 interface Materia {
   id: string;
   nome: string;
+  metaHoras: number; // Adicionado para bater com o index.js
   horasEstudadas: number;
-  cor?: string;
+}
+
+interface Habito {
+  id: string;
+  nome: string;
+  descricao: string;
+  categoria: string;
+  frequencia: string;
+  concluido: boolean;
+  streak: number;
+  emoji: string;
 }
 
 interface HistoricoEstudo {
   id: string;
   materia: string;
-  duracao: number; // em minutos
+  duracaoSegundos: number; // Ajustado para bater com o backend (index.js)
+  comentario?: string;
   data: string;
 }
 
 interface Treino {
   id: string;
-  tipo: string;
+  nome: string;
+  categoria: string;
+  duracao: string;
   exercicios: string[];
-  data: string;
-  duracao?: string;
 }
 
 interface Transacao {
-  id: number;
+  id: string; // backend usa UUID agora
   descricao: string;
   valor: number;
   tipo: "receita" | "despesa";
@@ -40,37 +52,24 @@ interface RegistroSaude {
   data: string;
   menstruando: boolean;
   notas: string;
-  sintomas: {
-    dorDeCabeca: boolean;
-    colica: boolean;
-    inchaco: boolean;
-    seiosSensiveis: boolean;
-    humorInstavel: boolean;
-  };
+  sintomas: string[]; // Simplificado para array de strings como no backend
 }
 
-// --- 2. Interface Principal do Progresso (Sem 'any') ---
+// --- 2. Interface Principal do Progresso ---
 
 interface UserProgress {
   saude?: Record<string, RegistroSaude>;
   financas?: Transacao[]; 
   materias?: Materia[];
+  habitos?: Habito[];            // <--- ADICIONADO AQUI
   historicoEstudos?: HistoricoEstudo[];
   treinos?: Treino[];
-  
-  // MUDANÇA AQUI: tarefas saiu de dentro de 'agenda'
   tarefas?: { 
-    id: string; // Adicionado id
+    id: string; 
     concluida: boolean; 
     titulo: string; 
     horario: string 
   }[];
-
-  // Se você não usa mais o dashboard antigo, pode remover depois
-  dashboard?: {
-    habitos?: { agua?: string; sono?: string; meditacao?: string };
-    metas?: { titulo: string; prazo: string }[];
-  };
 }
 
 // --- 3. Interface do Usuário e do Contexto ---
@@ -89,8 +88,6 @@ interface UserContextType {
   loading: boolean;
 }
 
-// --- 4. Criação do Contexto ---
-
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
@@ -102,18 +99,17 @@ export function UserProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       const data = await getLoggedUser();
       setUser(data);
-      // Cache local para persistência rápida entre reloads
       localStorage.setItem("userData", JSON.stringify(data));
     } catch (err) {
       console.error("Erro ao sincronizar usuário:", err);
-      setUser(null);
-      localStorage.removeItem("userData");
+      // Tenta recuperar do cache se falhar a rede (opcional)
+      const cached = localStorage.getItem("userData");
+      if (cached) setUser(JSON.parse(cached));
     } finally {
       setLoading(false);
     }
   }
 
-  // Carrega o usuário ao montar o componente
   useEffect(() => {
     refreshUser();
   }, []);
@@ -124,8 +120,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
     </UserContext.Provider>
   );
 }
-
-// --- 5. Hook Customizado ---
 
 export function useUser() {
   const context = useContext(UserContext);
