@@ -16,8 +16,7 @@ interface Treino {
   exercicios: string[];
 }
 
-// URL do backend
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
 
 export default function Treino() {
   const [active, setActive] = useState("Hoje");
@@ -27,20 +26,30 @@ export default function Treino() {
   const [listaTempExercicio, setListaTempExercicio] = useState<string[]>([]);
 
   // --- Carregar treinos do backend ---
-  useEffect(() => {
-    async function fetchTreinos() {
-      try {
-        const res = await axios.get(`${API_URL}/treinos`);
-        setFichas(res.data ?? []); // garante array
-      } catch (err) {
-        console.error("Erro ao carregar treinos:", err);
-        setFichas([]); // fallback para array vazio
-      }
-    }
-    fetchTreinos();
-  }, []);
+ useEffect(() => {
+  async function fetchTreinos() {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-  // --- Funções ---
+    try {
+      const res = await axios.get(`${API_URL}/treinos`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // GARANTIA: Só atualiza se o que vier do back for um Array
+      if (Array.isArray(res.data)) {
+        setFichas(res.data);
+      } else {
+        setFichas([]); // Se não for array, limpa para não quebrar
+      }
+    } catch (err) {
+      console.error("Erro ao carregar treinos:", err);
+      setFichas([]); // Em caso de erro de rede, mantém array vazio
+    }
+  }
+  fetchTreinos();
+}, []);
+
   const adicionarExercicioParaLista = () => {
     if (!novoExercicio.trim()) return;
     setListaTempExercicio(prev => [...prev, novoExercicio.trim()]);
@@ -53,6 +62,7 @@ export default function Treino() {
       return;
     }
 
+    const token = localStorage.getItem("token"); // BUSCA O TOKEN
     const novaFicha = {
       nome: novoNomeTreino,
       categoria: "Musculação",
@@ -61,7 +71,9 @@ export default function Treino() {
     };
 
     try {
-      const res = await axios.post(`${API_URL}/treinos`, novaFicha);
+      const res = await axios.post(`${API_URL}/treinos`, novaFicha, {
+        headers: { Authorization: `Bearer ${token}` } // ENVIA O TOKEN
+      });
       setFichas(prev => [res.data, ...prev]);
       setNovoNomeTreino("");
       setListaTempExercicio([]);
@@ -73,9 +85,12 @@ export default function Treino() {
 
   const excluirTreino = async (id: string) => {
     if (!confirm("Deseja excluir este treino permanentemente?")) return;
+    const token = localStorage.getItem("token"); // BUSCA O TOKEN
 
     try {
-      await axios.delete(`${API_URL}/treinos/${id}`);
+      await axios.delete(`${API_URL}/treinos/${id}`, {
+        headers: { Authorization: `Bearer ${token}` } // ENVIA O TOKEN
+      });
       setFichas(prev => prev.filter(f => f.id !== id));
     } catch (err) {
       console.error("Erro ao excluir treino:", err);
@@ -88,7 +103,6 @@ export default function Treino() {
         <p>Acompanhe seu progresso e mantenha o foco!</p>
       </Cabecalho>
 
-      {/* Cards de Resumo */}
       <div className="grid grid-cols-2 md:grid-cols-4 mt-4 gap-4">
         <Cardprogresso 
           title="Fichas" 
@@ -101,7 +115,6 @@ export default function Treino() {
         <Cardprogresso title="Kcal" progressoDodia="estimadas" porcentagem="320" icon={<Clock size={15} />} />
       </div>
 
-      {/* Menu */}
       <div className="mt-6">
         <GrayMenu items={[
           { title: "Hoje", onClick: () => setActive("Hoje"), active: active === "Hoje" },
@@ -111,14 +124,13 @@ export default function Treino() {
       </div>
 
       <div className="mt-6">
-        {/* ABA HOJE */}
         {active === "Hoje" && (
           <div className="space-y-4">
             <h2 className="text-pink-500 font-bold flex items-center gap-2 px-1 text-sm uppercase tracking-wider">
               <Clock size={18} /> Treinos Disponíveis
             </h2>
             <div className="grid gap-4">
-              {(fichas ?? []).map((treino) => (
+              {fichas.map((treino) => (
                 <div key={treino.id} className="bg-white border-2 border-pink-100 rounded-3xl p-6 shadow-sm">
                   <div className="flex justify-between items-start mb-4">
                     <div>
@@ -130,7 +142,7 @@ export default function Treino() {
                     </button>
                   </div>
                   <div className="bg-pink-50/50 rounded-2xl p-4 flex flex-wrap gap-x-5 gap-y-2">
-                    {(treino.exercicios ?? []).map((ex, i) => (
+                    {treino.exercicios.map((ex, i) => (
                       <span key={i} className="text-sm text-gray-600 flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-pink-400 rounded-full"></div> {ex}
                       </span>
@@ -142,10 +154,9 @@ export default function Treino() {
           </div>
         )}
 
-        {/* ABA MEUS TREINOS */}
         {active === "MeusTreinos" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {(fichas ?? []).map((treino) => (
+            {fichas.map((treino) => (
               <div key={treino.id} className="bg-white p-6 rounded-[2rem] border-2 border-pink-50 relative group hover:border-pink-200 transition-all">
                 <button onClick={() => excluirTreino(treino.id)} className="absolute top-5 right-5 text-gray-300 hover:text-red-500 transition-all">
                   <Trash2 size={18} />
@@ -158,7 +169,7 @@ export default function Treino() {
                   </div>
                 </div>
                 <div className="space-y-2 mt-4">
-                  {(treino.exercicios ?? []).map((ex, i) => (
+                  {treino.exercicios.map((ex, i) => (
                     <div key={i} className="flex items-center gap-3 text-sm text-gray-600 bg-pink-50/30 p-2.5 rounded-xl border border-pink-50">
                       <CheckCircle size={14} className="text-pink-300" />
                       {ex}
@@ -170,7 +181,6 @@ export default function Treino() {
           </div>
         )}
 
-        {/* ABA CRIAR TREINO */}
         {active === "CriarTreinos" && (
           <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border-2 border-pink-50 max-w-2xl mx-auto">
             <h3 className="text-xl font-black text-pink-500 mb-6 flex items-center gap-2 uppercase tracking-tight">

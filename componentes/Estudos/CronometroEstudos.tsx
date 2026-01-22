@@ -1,8 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { StudySession } from "./index";
-import { Pause, StopCircle, Play, AlertCircle } from "lucide-react"; // Adicionei AlertCircle para um aviso
+import { Pause, StopCircle, Play, AlertCircle } from "lucide-react";
+
+// Definimos a interface aqui para evitar erros de importação circular
+interface StudySession {
+  id: string; // Alterado para string para bater com o backend
+  materia: string;
+  comentario: string;
+  duracaoSegundos: number;
+  data: string;
+}
 
 interface Props {
   materias?: string[];
@@ -35,12 +43,13 @@ export default function CronometroEstudos({
   function finalizar() {
     if (!materia || tempo === 0) return;
 
+    // Criamos o objeto exatamente como o backend espera
     onFinalizar({
-      id: Date.now(),
+      id: crypto.randomUUID(), // Usando UUID para ser consistente
       materia,
       comentario,
       duracaoSegundos: tempo,
-      data: new Date().toLocaleString(),
+      data: new Date().toISOString(), // ISOString é melhor para salvar em bancos
     });
 
     setTempo(0);
@@ -54,12 +63,10 @@ export default function CronometroEstudos({
     return `${m}:${s.toString().padStart(2, "0")}`;
   }
 
-  // Verifica se o cronômetro está bloqueado
   const cronometroBloqueado = materia === "";
 
   return (
-    <div className="space-y-1">
-      {/* Aviso caso não tenha matéria selecionada */}
+    <div className="space-y-3"> {/* Ajustei o espaçamento */}
       {cronometroBloqueado && (
         <div className="flex items-center gap-2 text-xs text-pink-400 justify-center animate-pulse">
           <AlertCircle size={14} />
@@ -67,7 +74,7 @@ export default function CronometroEstudos({
         </div>
       )}
 
-      <div className={`text-center text-[2em] font-bold transition-colors ${cronometroBloqueado ? "text-gray-300" : "text-pink-500"}`}>
+      <div className={`text-center text-[2.5em] font-bold transition-colors ${cronometroBloqueado ? "text-gray-300" : "text-pink-500"}`}>
         {formatar(tempo)}
       </div>
       
@@ -84,47 +91,47 @@ export default function CronometroEstudos({
         ))}
       </select>
 
-      <div className="flex justify-center gap-2">
+      <div className="flex justify-center gap-4">
         {!rodando ? (
           <button
             onClick={() => setRodando(true)}
-            disabled={cronometroBloqueado} // BOTÃO DESATIVADO
-            className={`px-4 py-2 rounded transition-all ${
+            disabled={cronometroBloqueado}
+            className={`p-4 rounded-full transition-all ${
               cronometroBloqueado 
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed" 
-                : "bg-pink-400 text-pink-100 hover:bg-pink-500"
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
+                : "bg-pink-100 text-pink-500 hover:bg-pink-200"
             }`}
           >
-            <Play size={24} />
+            <Play size={28} fill="currentColor" />
           </button>
         ) : (
           <button
             onClick={() => setRodando(false)}
-            className="bg-pink-400 text-pink-100 px-4 py-2 rounded hover:bg-pink-500 transition-all"
+            className="bg-pink-500 text-white p-4 rounded-full hover:bg-pink-600 transition-all shadow-lg shadow-pink-200"
           >
-            <Pause size={24} />
+            <Pause size={28} fill="currentColor" />
           </button>
         )}
 
         <button
           onClick={finalizar}
-          disabled={cronometroBloqueado || tempo === 0} // SÓ PARA SE TIVER TEMPO
-          className={`px-4 py-2 rounded transition-all ${
+          disabled={cronometroBloqueado || tempo === 0}
+          className={`p-4 rounded-full transition-all ${
             cronometroBloqueado || tempo === 0
-              ? "bg-gray-200 text-gray-400 cursor-not-allowed" 
-              : "bg-pink-400 text-pink-100 hover:bg-pink-500"
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
+              : "bg-red-100 text-red-500 hover:bg-red-200"
           }`}
         >
-          <StopCircle size={24} />
+          <StopCircle size={28} fill="currentColor" />
         </button>
       </div>
       
       <input
-        placeholder="O que estudamos hoje:"
+        placeholder="O que estudamos hoje?"
         value={comentario}
         onChange={(e) => setComentario(e.target.value)}
-        disabled={cronometroBloqueado} // IMPEDE COMENTÁRIO SE NÃO TIVER MATÉRIA
-        className="border p-2 pb-6 w-full rounded disabled:bg-gray-50 disabled:cursor-not-allowed"
+        disabled={cronometroBloqueado}
+        className="border p-3 w-full rounded disabled:bg-gray-50 disabled:cursor-not-allowed focus:border-pink-400 outline-none transition-all"
       />
     </div>
   );
