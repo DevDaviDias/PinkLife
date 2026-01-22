@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
-import TestApi from "@/componentes/testapi/testApi"
+
 import { useState, useEffect, useRef } from "react";
 import ContainerPages from "../ui/ContainerPages";
 import Cabecalho from "../ui/Cabecalho";
@@ -202,7 +202,7 @@ export default function Alimentacao() {
         )}
       </div>
 
-      <TestApi/>
+      
     </ContainerPages>
   );
 }

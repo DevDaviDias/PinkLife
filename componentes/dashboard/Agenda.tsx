@@ -20,49 +20,53 @@ export default function Agenda() {
   const [novaDesc, setNovaDesc] = useState("");
   const [novaData, setNovaData] = useState("");
   const [novoHorario, setNovoHorario] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-  // --- Carregar lembretes do backend
+  // --- 1. BUSCAR DADOS DO BACKEND (Ao carregar a página) ---
   useEffect(() => {
     async function fetchAgenda() {
       try {
+        setLoading(true);
         const user = await getLoggedUser();
-        const agenda = user.progress?.agenda?.tarefas || [];
-        setLembretes(agenda);
-        localStorage.setItem("agenda_lembretes", JSON.stringify(agenda));
+        // Acessa o caminho: user -> progress -> agenda -> tarefas
+        const agendaSalva = user.progress?.agenda?.tarefas || [];
+        setLembretes(agendaSalva);
       } catch (err) {
         console.error("Erro ao buscar agenda", err);
-        // fallback para localStorage
+        // Fallback para o localStorage se o servidor falhar
         const salvos = localStorage.getItem("agenda_lembretes");
         if (salvos) setLembretes(JSON.parse(salvos));
+      } finally {
+        setLoading(false);
       }
     }
     fetchAgenda();
   }, []);
 
-  // --- Atualiza localStorage e backend quando lembretes mudam
-  useEffect(() => {
-    localStorage.setItem("agenda_lembretes", JSON.stringify(lembretes));
+  // --- 2. FUNÇÃO PARA SALVAR NO BANCO ---
+  const persistirDados = async (novaLista: ItemAgenda[]) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-    async function saveAgenda() {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      try {
-        await axios.post(
-          `${API_URL}/user/progress`,
-          { module: "agenda", data: { tarefas: lembretes } },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      } catch (err) {
-        console.error("Erro ao salvar agenda no backend", err);
-      }
+    try {
+      await axios.post(
+        `${API_URL}/user/progress`,
+        { 
+          module: "agenda", 
+          data: { tarefas: novaLista } 
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // Backup rápido no navegador
+      localStorage.setItem("agenda_lembretes", JSON.stringify(novaLista));
+    } catch (err) {
+      console.error("Erro ao sincronizar com o servidor", err);
     }
+  };
 
-    saveAgenda();
-  }, [lembretes]);
-
+  // --- 3. AÇÕES DO USUÁRIO ---
   function adicionarLembrete() {
     if (!novaDesc || !novaData || !novoHorario) return;
 
@@ -74,7 +78,11 @@ export default function Agenda() {
       horario: novoHorario,
     };
 
-    setLembretes((prev) => [novoItem, ...prev]);
+    const listaAtualizada = [novoItem, ...lembretes];
+    setLembretes(listaAtualizada);
+    persistirDados(listaAtualizada); // Envia para o banco
+
+    // Resetar campos
     setNovaDesc("");
     setNovaData("");
     setNovoHorario("");
@@ -82,7 +90,9 @@ export default function Agenda() {
   }
 
   function excluirLembrete(id: number) {
-    setLembretes((prev) => prev.filter(item => item.id !== id));
+    const listaAtualizada = lembretes.filter(item => item.id !== id);
+    setLembretes(listaAtualizada);
+    persistirDados(listaAtualizada); // Envia para o banco
   }
 
   return (
@@ -100,7 +110,9 @@ export default function Agenda() {
         }
       >
         <div className="flex-1 overflow-y-auto pr-1 space-y-2 custom-scrollbar">
-          {lembretes.length === 0 ? (
+          {loading ? (
+            <p className="text-center text-xs text-gray-400 animate-pulse">Carregando...</p>
+          ) : lembretes.length === 0 ? (
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-3 p-3 bg-gray-100/50 rounded-lg border border-dashed border-gray-300 opacity-60">
                 <div className="w-1 h-5 rounded-full bg-gray-300"></div>
@@ -120,7 +132,7 @@ export default function Agenda() {
                 <div className="flex items-center gap-3">
                   <div className="w-1 h-5 rounded-full" style={{ backgroundColor: item.cor }}></div>
                   <div>
-                    <p className="text-sm font-medium text-pink-600 dark:pink-gray-200">{item.descricao}</p>
+                    <p className="text-sm font-medium text-pink-600">{item.descricao}</p>
                     <p className="text-[10px] text-gray-400 font-mono">
                       {item.data.split('-').reverse().join('/')} • {item.horario}
                     </p>
@@ -138,6 +150,7 @@ export default function Agenda() {
         </div>
       </StatusCard>
 
+      {/* MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
            <div className="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl">
@@ -156,8 +169,8 @@ export default function Agenda() {
                   className="w-full p-3 bg-pink-50 rounded-xl outline-none border border-transparent focus:border-pink-300"
                 />
                 <div className="grid grid-cols-2 gap-3">
-                  <input type="date" value={novaData} onChange={(e) => setNovaData(e.target.value)} className="p-3 bg-pink-50 rounded-xl outline-none text-sm" />
-                  <input type="time" value={novoHorario} onChange={(e) => setNovoHorario(e.target.value)} className="p-3 bg-pink-50 rounded-xl outline-none text-sm" />
+                  <input type="date" value={novaData} onChange={(e) => setNovaData(e.target.value)} className="p-3 bg-pink-50 rounded-xl outline-none text-sm text-gray-700" />
+                  <input type="time" value={novoHorario} onChange={(e) => setNovoHorario(e.target.value)} className="p-3 bg-pink-50 rounded-xl outline-none text-sm text-gray-700" />
                 </div>
                 <button onClick={adicionarLembrete} className="w-full py-4 bg-pink-500 text-white rounded-xl font-bold shadow-lg hover:bg-pink-600 active:scale-95 transition-all">
                   Guardar na Agenda

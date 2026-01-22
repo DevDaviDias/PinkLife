@@ -5,6 +5,7 @@ import { useState } from "react";
 import ContainerPages from "@/componentes/ui/ContainerPages";
 import Cabecalho from "../ui/Cabecalho";
 import StatusCard from "../ui/StatusCard ";
+import TestApi from "@/componentes/testapi/testApi"
 
 export default function Configuracoes() {
   const [darkMode, setDarkMode] = useState(false);
@@ -107,6 +108,7 @@ export default function Configuracoes() {
           </div>
         </StatusCard>
       </div>
+      <TestApi/>
     </ContainerPages>
   );
 }
