@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect, useRef, ReactNode } from "react";
+import axios from "axios";
 import { 
   format, addMonths, subMonths, startOfMonth, endOfMonth, 
   startOfWeek, endOfWeek, isSameMonth, addDays, parseISO 
@@ -16,6 +17,8 @@ import {
 import ContainerPages from "../ui/ContainerPages";
 import Cabecalho from "../ui/Cabecalho";
 import GrayMenu from "@/componentes/ui/GrayMenu";
+
+const API_URL = "http://localhost:3001";
 
 // --- Interfaces de Dados ---
 interface Sintomas {
@@ -33,7 +36,7 @@ interface RegistroDia {
   notas: string;
 }
 
-// --- Interfaces de Props para Subcomponentes ---
+// --- Interfaces de Props ---
 interface CalendarioProps {
   currentMonth: Date;
   registros: Record<string, RegistroDia>;
@@ -65,32 +68,54 @@ export default function Saude() {
   const [analisando, setAnalisando] = useState(false);
   const [relatorioIA, setRelatorioIA] = useState<string | null>(null);
 
+  // --- CARREGAR DADOS DO BANCO ---
   useEffect(() => {
-    const saved = localStorage.getItem("saude_v5_pro");
-    if (saved) setRegistros(JSON.parse(saved));
-    isLoaded.current = true;
+    const carregarDados = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      try {
+        const res = await axios.get(`${API_URL}/saude`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setRegistros(res.data || {});
+        isLoaded.current = true;
+      } catch (err) {
+        console.error("Erro ao carregar saúde:", err);
+      }
+    };
+    carregarDados();
   }, []);
 
-  useEffect(() => {
-    if (isLoaded.current) localStorage.setItem("saude_v5_pro", JSON.stringify(registros));
-  }, [registros]);
+  // --- ATUALIZAR DIA (SALVAR NO BANCO) ---
+  const atualizarDia = async (data: string, updates: Partial<RegistroDia>) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-  const atualizarDia = (data: string, updates: Partial<RegistroDia>) => {
-    setRegistros(prev => {
-      const diaAtual = prev[data] || { 
-        data, menstruando: false, notas: "", 
-        sintomas: { dorDeCabeca: false, colica: false, inchaco: false, seiosSensiveis: false, humorInstavel: false } 
-      };
-      return { ...prev, [data]: { ...diaAtual, ...updates } };
-    });
+    const diaAtual = registros[data] || { 
+      data, menstruando: false, notas: "", 
+      sintomas: { dorDeCabeca: false, colica: false, inchaco: false, seiosSensiveis: false, humorInstavel: false } 
+    };
+
+    const novoRegistro = { ...diaAtual, ...updates };
+
+    // Atualização Otimista (UI primeiro)
+    setRegistros(prev => ({ ...prev, [data]: novoRegistro }));
+
+    try {
+      await axios.post(`${API_URL}/saude`, novoRegistro, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    } catch (err) {
+      console.error("Erro ao salvar dia:", err);
+    }
   };
 
   const gerarAnaliseIA = () => {
     setAnalisando(true);
     setTimeout(() => {
       const lista = Object.values(registros);
-      let msg = "Com base nos seus dados de fluxo e sintomas, seu ciclo demonstra regularidade. ";
-      if (lista.filter(r => r.sintomas.colica).length > 3) msg += "Notei cólicas frequentes; considere monitorar a intensidade.";
+      let msg = "Ciclo estável. ";
+      if (lista.filter(r => r.sintomas.colica).length > 3) msg += "Notei cólicas frequentes.";
       setRelatorioIA(msg);
       setAnalisando(false);
     }, 2000);
@@ -140,12 +165,8 @@ export default function Saude() {
                     .sort((a, b) => b.data.localeCompare(a.data))
                     .map((reg) => (
                       <tr key={reg.data} className="active:bg-gray-50 transition-colors cursor-pointer" onClick={() => setDiaSelecionado(reg.data)}>
-                        <td className="p-4">
-                          <span className="text-xs font-bold text-gray-700">{format(parseISO(reg.data), "dd/MM")}</span>
-                        </td>
-                        <td className="p-4 text-center">
-                          {reg.menstruando && <Droplets size={16} className="text-pink-500 mx-auto" />}
-                        </td>
+                        <td className="p-4"><span className="text-xs font-bold text-gray-700">{format(parseISO(reg.data), "dd/MM")}</span></td>
+                        <td className="p-4 text-center">{reg.menstruando && <Droplets size={16} className="text-pink-500 mx-auto" />}</td>
                         <td className="p-4">
                           <div className="flex flex-wrap gap-1 mb-1">
                             {reg.sintomas.colica && <div className="w-2 h-2 rounded-full bg-amber-400" />}
@@ -162,17 +183,6 @@ export default function Saude() {
             </div>
           </div>
         )}
-
-        {active === "Análise" && (
-          <div className="max-w-xl mx-auto px-4 text-center">
-             <div className="bg-white p-8 rounded-[3rem] border-2 border-purple-100">
-                <Sparkles size={30} className="mx-auto mb-4 text-purple-400" />
-                {analisando ? <p className="text-xs animate-pulse">Processando...</p> : 
-                 relatorioIA ? <p className="text-sm text-purple-900">{relatorioIA}</p> : 
-                 <button onClick={gerarAnaliseIA} className="w-full py-4 bg-purple-600 text-white rounded-2xl font-black">Gerar Análise</button>}
-             </div>
-          </div>
-        )}
       </div>
 
       <ModalSintomas 
@@ -185,7 +195,7 @@ export default function Saude() {
   );
 }
 
-// --- Subcomponentes Tipados ---
+// --- SUBCOMPONENTES ---
 
 function Calendario({ currentMonth, registros, onSelect }: CalendarioProps) {
   const monthStart = startOfMonth(currentMonth);
@@ -219,7 +229,7 @@ function Calendario({ currentMonth, registros, onSelect }: CalendarioProps) {
 
 function ModalSintomas({ dia, registros, onClose, onUpdate }: ModalSintomasProps) {
   if (!dia) return null;
-  const reg = registros[dia];
+  const reg = registros[dia] || { menstruando: false, notas: "", sintomas: { dorDeCabeca: false, colica: false, inchaco: false, humorInstavel: false, seiosSensiveis: false } };
 
   return (
     <AnimatePresence>
@@ -231,17 +241,17 @@ function ModalSintomas({ dia, registros, onClose, onUpdate }: ModalSintomasProps
             <button onClick={onClose} className="p-2 bg-gray-50 rounded-full"><X size={20}/></button>
           </div>
           <div className="space-y-4">
-             <button onClick={() => onUpdate(dia, { menstruando: !reg?.menstruando })} className={`w-full p-4 rounded-2xl border-2 flex justify-between items-center ${reg?.menstruando ? 'border-pink-400 bg-pink-50' : 'border-gray-50'}`}>
+             <button onClick={() => onUpdate(dia, { menstruando: !reg.menstruando })} className={`w-full p-4 rounded-2xl border-2 flex justify-between items-center ${reg.menstruando ? 'border-pink-400 bg-pink-50' : 'border-gray-50'}`}>
                 <span className="font-bold text-sm flex items-center gap-2"><Droplets size={18} className="text-pink-500"/> Fluxo Menstrual</span>
-                <div className={`w-4 h-4 rounded-full ${reg?.menstruando ? 'bg-pink-400' : 'bg-gray-200'}`} />
+                <div className={`w-4 h-4 rounded-full ${reg.menstruando ? 'bg-pink-400' : 'bg-gray-200'}`} />
              </button>
              <div className="grid grid-cols-2 gap-2">
-                <SintomaBotao label="Cólica" icon={<Thermometer size={14}/>} active={reg?.sintomas?.colica} onClick={() => onUpdate(dia, { sintomas: { ...reg?.sintomas, colica: !reg?.sintomas?.colica } })} color="amber" />
-                <SintomaBotao label="Cabeça" icon={<Brain size={14}/>} active={reg?.sintomas?.dorDeCabeca} onClick={() => onUpdate(dia, { sintomas: { ...reg?.sintomas, dorDeCabeca: !reg?.sintomas?.dorDeCabeca } })} color="purple" />
-                <SintomaBotao label="Inchaço" icon={<Wind size={14}/>} active={reg?.sintomas?.inchaco} onClick={() => onUpdate(dia, { sintomas: { ...reg?.sintomas, inchaco: !reg?.sintomas?.inchaco } })} color="blue" />
-                <SintomaBotao label="Humor" icon={<Smile size={14}/>} active={reg?.sintomas?.humorInstavel} onClick={() => onUpdate(dia, { sintomas: { ...reg?.sintomas, humorInstavel: !reg?.sintomas?.humorInstavel } })} color="green" />
+                <SintomaBotao label="Cólica" icon={<Thermometer size={14}/>} active={reg.sintomas?.colica} onClick={() => onUpdate(dia, { sintomas: { ...reg.sintomas, colica: !reg.sintomas?.colica } })} color="amber" />
+                <SintomaBotao label="Cabeça" icon={<Brain size={14}/>} active={reg.sintomas?.dorDeCabeca} onClick={() => onUpdate(dia, { sintomas: { ...reg.sintomas, dorDeCabeca: !reg.sintomas?.dorDeCabeca } })} color="purple" />
+                <SintomaBotao label="Inchaço" icon={<Wind size={14}/>} active={reg.sintomas?.inchaco} onClick={() => onUpdate(dia, { sintomas: { ...reg.sintomas, inchaco: !reg.sintomas?.inchaco } })} color="blue" />
+                <SintomaBotao label="Humor" icon={<Smile size={14}/>} active={reg.sintomas?.humorInstavel} onClick={() => onUpdate(dia, { sintomas: { ...reg.sintomas, humorInstavel: !reg.sintomas?.humorInstavel } })} color="green" />
              </div>
-             <textarea placeholder="Notas..." value={reg?.notas || ""} onChange={(e) => onUpdate(dia, { notas: e.target.value })} className="w-full p-4 bg-gray-50 rounded-2xl text-xs min-h-[80px] outline-none" />
+             <textarea placeholder="Notas..." value={reg.notas || ""} onChange={(e) => onUpdate(dia, { notas: e.target.value })} className="w-full p-4 bg-gray-50 rounded-2xl text-xs min-h-[80px] outline-none" />
           </div>
         </motion.div>
       </div>
