@@ -52,17 +52,21 @@ interface RegistroSaude {
 // --- 2. Interface Principal do Progresso (Sem 'any') ---
 
 interface UserProgress {
-  // O módulo de saúde é um objeto onde a chave é a data "YYYY-MM-DD"
   saude?: Record<string, RegistroSaude>;
   financas?: Transacao[]; 
   materias?: Materia[];
   historicoEstudos?: HistoricoEstudo[];
   treinos?: Treino[];
   
-  agenda?: {
-    tarefas?: { concluida: boolean; titulo: string; horario: string }[];
-  };
+  // MUDANÇA AQUI: tarefas saiu de dentro de 'agenda'
+  tarefas?: { 
+    id: string; // Adicionado id
+    concluida: boolean; 
+    titulo: string; 
+    horario: string 
+  }[];
 
+  // Se você não usa mais o dashboard antigo, pode remover depois
   dashboard?: {
     habitos?: { agua?: string; sono?: string; meditacao?: string };
     metas?: { titulo: string; prazo: string }[];
