@@ -99,6 +99,20 @@ interface ViagensData {
   mala: ItemMala[];
 }
 
+interface TarefaCasa {
+  id: string;
+  tarefa: string;
+  feita: boolean;
+}
+
+interface CasaData {
+  tarefas: TarefaCasa[];
+  cardapio: {
+    almoco: string;
+    jantar: string;
+  };
+}
+
 interface UserProgress {
   saude?: Record<string, RegistroSaude>;
   financas?: Transacao[]; 
@@ -114,7 +128,8 @@ interface UserProgress {
   }[];
  beleza?: BelezaData; 
   alimentacao?: AlimentacaoData;
-  viagens?: ViagensData; // <--- ADICIONADO // <--- ADICIONADO// <--- ADICIONE ESTA LINHA AQUI
+  viagens?: ViagensData;
+  casa?: CasaData; // <--- ADICIONADO // <--- ADICIONADO// <--- ADICIONE ESTA LINHA AQUI
 }
 
 // --- 3. Interface do Usuário e do Contexto ---
