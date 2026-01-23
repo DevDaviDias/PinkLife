@@ -54,14 +54,28 @@ interface RegistroSaude {
   notas: string;
   sintomas: string[]; // Simplificado para array de strings como no backend
 }
-
+interface BelezaData {
+  skincareManha: {
+    limpador: boolean;
+    tonico: boolean;
+    hidratante: boolean;
+    protetor: boolean;
+  };
+  skincareNoite: {
+    demaquilante: boolean;
+    limpador: boolean;
+    serum: boolean;
+    hidratante: boolean;
+  };
+  cronogramaCapilar: string;
+}
 // --- 2. Interface Principal do Progresso ---
 
 interface UserProgress {
   saude?: Record<string, RegistroSaude>;
   financas?: Transacao[]; 
   materias?: Materia[];
-  habitos?: Habito[];            // <--- ADICIONADO AQUI
+  habitos?: Habito[];
   historicoEstudos?: HistoricoEstudo[];
   treinos?: Treino[];
   tarefas?: { 
@@ -70,6 +84,7 @@ interface UserProgress {
     titulo: string; 
     horario: string 
   }[];
+  beleza?: BelezaData; // <--- ADICIONE ESTA LINHA AQUI
 }
 
 // --- 3. Interface do Usuário e do Contexto ---
