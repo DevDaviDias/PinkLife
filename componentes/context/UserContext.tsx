@@ -8,7 +8,7 @@ import { getLoggedUser } from "@/componentes/services/APIservices";
 interface Materia {
   id: string;
   nome: string;
-  metaHoras: number; // Adicionado para bater com o index.js
+  metaHoras: number;
   horasEstudadas: number;
 }
 
@@ -26,7 +26,7 @@ interface Habito {
 interface HistoricoEstudo {
   id: string;
   materia: string;
-  duracaoSegundos: number; // Ajustado para bater com o backend (index.js)
+  duracaoSegundos: number;
   comentario?: string;
   data: string;
 }
@@ -40,10 +40,10 @@ interface Treino {
 }
 
 interface Transacao {
-  id: string; // backend usa UUID agora
+  id: string;
   descricao: string;
   valor: number;
-  tipo: "receita" | "despesa";
+  tipo: "receita" | "despesa" | "Receita" | "Despesa";
   categoria: string;
   data: string;
 }
@@ -52,8 +52,9 @@ interface RegistroSaude {
   data: string;
   menstruando: boolean;
   notas: string;
-  sintomas: string[]; // Simplificado para array de strings como no backend
+  sintomas: string[];
 }
+
 interface BelezaData {
   skincareManha: {
     limpador: boolean;
@@ -69,7 +70,6 @@ interface BelezaData {
   };
   cronogramaCapilar: string;
 }
-// --- 2. Interface Principal do Progresso ---
 
 interface ItemCompra {
   id: string;
@@ -87,7 +87,6 @@ interface AlimentacaoData {
   compras: ItemCompra[];
 }
 
-// 1. Defina as interfaces acima da UserProgress
 interface ItemMala {
   id: string;
   texto: string;
@@ -112,18 +111,17 @@ interface CasaData {
     jantar: string;
   };
 }
-interface Tarefa {
+
+// Interface da Tarefa alinhada com o Componente Agenda
+interface TarefaAgenda {
   id: string;
   concluida: boolean;
-  descricao?: string;
-  titulo?: string;
+  descricao: string; // Importante: deve ser igual ao backend
+  horario: string;
+  data: string;
 }
 
-interface StatusMessages {
-  treino: string;
-  estudo: string;
-  financas: string;
-}
+// --- 2. Interface Principal do Progresso ---
 
 interface UserProgress {
   saude?: Record<string, RegistroSaude>;
@@ -132,16 +130,11 @@ interface UserProgress {
   habitos?: Habito[];
   historicoEstudos?: HistoricoEstudo[];
   treinos?: Treino[];
-  tarefas?: { 
-    id: string; 
-    concluida: boolean; 
-    titulo: string; 
-    horario: string 
-  }[];
- beleza?: BelezaData; 
+  tarefas?: TarefaAgenda[]; // <--- USANDO A INTERFACE CRIADA ACIMA
+  beleza?: BelezaData; 
   alimentacao?: AlimentacaoData;
   viagens?: ViagensData;
-  casa?: CasaData; // <--- ADICIONADO // <--- ADICIONADO// <--- ADICIONE ESTA LINHA AQUI
+  casa?: CasaData;
 }
 
 // --- 3. Interface do Usuário e do Contexto ---
@@ -170,18 +163,25 @@ export function UserProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       const data = await getLoggedUser();
-      setUser(data);
-      localStorage.setItem("userData", JSON.stringify(data));
+      
+      if (data) {
+        setUser(data);
+        // Atualiza o cache para persistência offline rápida
+        localStorage.setItem("userData", JSON.stringify(data));
+      }
     } catch (err) {
       console.error("Erro ao sincronizar usuário:", err);
-      // Tenta recuperar do cache se falhar a rede (opcional)
+      // Recupera do cache se a rede falhar
       const cached = localStorage.getItem("userData");
-      if (cached) setUser(JSON.parse(cached));
+      if (cached) {
+        setUser(JSON.parse(cached));
+      }
     } finally {
       setLoading(false);
     }
   }
 
+  // Sincroniza uma vez ao carregar o app
   useEffect(() => {
     refreshUser();
   }, []);
