@@ -1,10 +1,11 @@
-// pages/testUser.tsx
+"use client";
+
 import { useEffect, useState } from "react";
 import { getLoggedUser } from "@/componentes/services/APIservices";
 
-// --- DEFINIÇÃO DE TIPOS PRECISOS (Substituindo o 'any') ---
+// --- INTERFACES SINCRONIZADAS COM O BACKEND ---
 interface Tarefa {
-  titulo: string;
+  descricao: string; // Mudado de titulo para descricao
   horario: string;
 }
 
@@ -23,19 +24,14 @@ interface Historico {
 }
 
 interface UserProgress {
-  estudos?: {
-    materias: Materia[];
-    historico: Historico[];
-  };
+  materias?: Materia[];           // Direto no progress, como no backend
+  historicoEstudos?: Historico[]; // Direto no progress
+  tarefas?: Tarefa[];             // Direto no progress
   treinos?: Array<{
     id: string;
     nome: string;
     exercicios: string[];
   }>;
-  dashboard?: {
-    agenda?: { tarefas: Tarefa[] };
-    habitos?: Record<string, string>;
-  };
 }
 
 interface User {
@@ -54,14 +50,13 @@ export default function TestUser() {
         const data = await getLoggedUser();
         setUser(data);
       } catch (err: unknown) {
-        // Tratamento correto do erro sem usar 'any' no catch
         if (err && typeof err === 'object' && 'response' in err) {
           const axiosError = err as { response: { data: { msg: string } } };
           setError(axiosError.response.data.msg);
         } else if (err instanceof Error) {
           setError(err.message);
         } else {
-          setError("Erro desconhecido ao buscar usuário");
+          setError("Erro de conexão com o servidor 3001");
         }
       }
     }
@@ -69,14 +64,15 @@ export default function TestUser() {
   }, []);
 
   if (error) return (
-    <div className="p-10 text-red-500 bg-red-50 rounded-xl m-4 border border-red-200">
-      <h1 className="font-bold text-xl mb-2">❌ Erro de Autenticação</h1>
-      <p className="text-sm font-mono bg-white p-2 rounded border">{error}</p>
+    <div className="p-10 text-red-500 bg-red-50 rounded-xl m-4 border border-red-200 max-w-2xl mx-auto">
+      <h1 className="font-bold text-xl mb-2">❌ Erro de Sincronização</h1>
+      <p className="text-sm font-mono bg-white p-4 rounded border mb-4">{error}</p>
+      <p className="text-xs text-red-400 mb-6 italic">Dica: Verifique se o servidor backend está rodando na porta 3001.</p>
       <button 
         onClick={() => window.location.reload()} 
-        className="mt-6 bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-all font-bold"
+        className="w-full bg-red-500 text-white px-6 py-3 rounded-xl hover:bg-red-600 transition-all font-bold"
       >
-        Tentar novamente
+        Tentar Novamente
       </button>
     </div>
   );
@@ -84,19 +80,19 @@ export default function TestUser() {
   if (!user) return (
     <div className="flex flex-col items-center justify-center h-screen gap-4">
       <div className="w-12 h-12 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin"></div>
-      <p className="text-pink-500 font-medium animate-pulse">Sincronizando com MongoDB Atlas...</p>
+      <p className="text-pink-500 font-medium animate-pulse">Consultando MongoDB Atlas...</p>
     </div>
   );
 
   return (
-    <div className="p-8 max-w-5xl mx-auto font-sans bg-white min-h-screen">
-      <header className="flex justify-between items-end border-b-2 border-gray-100 pb-6 mb-8">
+    <div className="p-8 max-w-6xl mx-auto font-sans bg-gray-50 min-h-screen">
+      <header className="flex justify-between items-end border-b-2 border-gray-200 pb-6 mb-8">
         <div>
           <h1 className="text-3xl font-black text-gray-800 tracking-tight">Debug Panel 🛡️</h1>
-          <p className="text-gray-400 text-sm mt-1">Verificando integridade dos dados no Banco de Dados</p>
+          <p className="text-gray-400 text-sm mt-1">Inspeção técnica dos dados persistidos</p>
         </div>
         <div className="text-right">
-          <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Usuário Ativo</p>
+          <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Usuário Logado</p>
           <p className="font-bold text-pink-500">{user.name} <span className="text-gray-300 font-normal">({user.email})</span></p>
         </div>
       </header>
@@ -106,25 +102,26 @@ export default function TestUser() {
         <div className="lg:col-span-2">
           <h2 className="text-sm font-black text-gray-400 uppercase mb-4 flex items-center gap-2">
             <span className="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
-            Live Database Snapshot
+            Raw JSON Output (User.progress)
           </h2>
-          <div className="bg-gray-900 text-pink-300 p-6 rounded-[2rem] overflow-auto max-h-[600px] text-xs font-mono shadow-2xl border-4 border-gray-800">
+          <div className="bg-gray-900 text-green-400 p-6 rounded-[2rem] overflow-auto max-h-[600px] text-[11px] font-mono shadow-2xl border-4 border-gray-800 custom-scrollbar">
             <pre>{JSON.stringify(user.progress, null, 2)}</pre>
           </div>
         </div>
 
         {/* Lado Direito: Resumo de Módulos */}
         <div className="space-y-4">
-          <h2 className="text-sm font-black text-gray-400 uppercase mb-4">Estatísticas de Cache</h2>
+          <h2 className="text-sm font-black text-gray-400 uppercase mb-4">Contagem de Objetos</h2>
           
-          <StatCard title="Estudos" icon="📚" value={user.progress.estudos?.materias?.length || 0} unit="matérias" />
+          <StatCard title="Matérias" icon="📚" value={user.progress.materias?.length || 0} unit="registros" />
           <StatCard title="Treinos" icon="🏋️" value={user.progress.treinos?.length || 0} unit="fichas" />
-          <StatCard title="Histórico" icon="🕒" value={user.progress.estudos?.historico?.length || 0} unit="sessões" />
+          <StatCard title="Tarefas" icon="📅" value={user.progress.tarefas?.length || 0} unit="itens" />
+          <StatCard title="Histórico" icon="🕒" value={user.progress.historicoEstudos?.length || 0} unit="sessões" />
           
-          <div className="mt-8 p-6 bg-pink-50 rounded-[2rem] border-2 border-pink-100">
-             <h3 className="font-bold text-pink-600 mb-2">Status do Atlas</h3>
-             <p className="text-xs text-pink-400 leading-relaxed">
-               Os dados exibidos acima estão persistidos no Cluster 0. O reinício do servidor Node não afetará esses valores.
+          <div className="mt-8 p-6 bg-blue-50 rounded-[2rem] border-2 border-blue-100">
+             <h3 className="font-bold text-blue-600 mb-2 text-sm">Status da API</h3>
+             <p className="text-[11px] text-blue-400 leading-relaxed">
+                Conexão estabelecida com sucesso. Os dados acima refletem o estado atual da coleção users no banco de dados.
              </p>
           </div>
         </div>
@@ -133,15 +130,14 @@ export default function TestUser() {
   );
 }
 
-// Sub-componente interno para os cards de estatística
 function StatCard({ title, icon, value, unit }: { title: string, icon: string, value: number, unit: string }) {
   return (
-    <div className="bg-white border-2 border-gray-50 p-6 rounded-3xl hover:border-pink-100 transition-all shadow-sm">
+    <div className="bg-white border-2 border-gray-100 p-5 rounded-3xl hover:border-pink-200 transition-all shadow-sm">
       <div className="flex items-center gap-3 mb-2">
         <span className="text-xl">{icon}</span>
-        <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">{title}</h3>
+        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{title}</h3>
       </div>
-      <p className="text-3xl font-black text-gray-800">{value} <span className="text-sm font-normal text-gray-400">{unit}</span></p>
+      <p className="text-2xl font-black text-gray-800">{value} <span className="text-xs font-normal text-gray-400">{unit}</span></p>
     </div>
   );
 }
