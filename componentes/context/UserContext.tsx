@@ -112,6 +112,18 @@ interface CasaData {
     jantar: string;
   };
 }
+interface Tarefa {
+  id: string;
+  concluida: boolean;
+  descricao?: string;
+  titulo?: string;
+}
+
+interface StatusMessages {
+  treino: string;
+  estudo: string;
+  financas: string;
+}
 
 interface UserProgress {
   saude?: Record<string, RegistroSaude>;
