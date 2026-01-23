@@ -71,6 +71,22 @@ interface BelezaData {
 }
 // --- 2. Interface Principal do Progresso ---
 
+interface ItemCompra {
+  id: string;
+  item: string;
+  comprado: boolean;
+}
+
+interface AlimentacaoData {
+  refeicoes: {
+    cafe: string;
+    almoco: string;
+    lanche: string;
+    jantar: string;
+  };
+  compras: ItemCompra[];
+}
+
 interface UserProgress {
   saude?: Record<string, RegistroSaude>;
   financas?: Transacao[]; 
@@ -84,7 +100,8 @@ interface UserProgress {
     titulo: string; 
     horario: string 
   }[];
-  beleza?: BelezaData; // <--- ADICIONE ESTA LINHA AQUI
+ beleza?: BelezaData; 
+  alimentacao?: AlimentacaoData; // <--- ADICIONADO// <--- ADICIONE ESTA LINHA AQUI
 }
 
 // --- 3. Interface do Usuário e do Contexto ---
