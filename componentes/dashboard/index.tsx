@@ -45,7 +45,7 @@ export default function Dashboard() {
   // 1. Forçar atualização ao montar o Dashboard
   useEffect(() => {
     refreshUser();
-  }, []);
+  },[]);
 
   // 2. Processar os dados sempre que o 'user' mudar
   useEffect(() => {
