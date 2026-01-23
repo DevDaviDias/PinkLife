@@ -1,7 +1,7 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
+import axios from "axios";
 import ContainerPages from "../ui/ContainerPages";
 import Cabecalho from "../ui/Cabecalho";
 import Cardprogresso from "../ui/Cardprogresso";
@@ -16,8 +16,11 @@ import {
   ExternalLink,
   Info
 } from "lucide-react";
+import { useUser } from "@/componentes/context/UserContext";
 
-// --- Definição de Tipos ---
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+// --- Interfaces (Devem ser idênticas ao UserContext) ---
 type CategoriaMala = "Roupas" | "Higiene" | "Documentos" | "Outros";
 
 interface ItemMala {
@@ -28,54 +31,62 @@ interface ItemMala {
 }
 
 export default function Viagens() {
+  const { user, refreshUser } = useUser();
   const [active, setActive] = useState("Mala");
-  const isLoaded = useRef(false);
-
-  const [itensMala, setItensMala] = useState<ItemMala[]>([]);
   const [novoItem, setNovoItem] = useState("");
   const [categoriaSel, setCategoriaSel] = useState<CategoriaMala>("Roupas");
 
-  // Lista de categorias para o map (com tipagem correta)
   const categorias: CategoriaMala[] = ["Roupas", "Higiene", "Documentos", "Outros"];
 
-  // Carregar dados
-  useEffect(() => {
-    const savedMala = localStorage.getItem("viagem_mala_v2");
-    if (savedMala) {
-      try {
-        setItensMala(JSON.parse(savedMala));
-      } catch (e) {
-        console.error("Erro ao carregar mala", e);
-      }
-    }
-    isLoaded.current = true;
-  }, []);
+  // 1. Puxa os dados garantindo que 'mala' seja sempre um Array de ItemMala
+  const mala: ItemMala[] = user?.progress?.viagens?.mala || [];
 
-  // Salvar dados
-  useEffect(() => {
-    if (isLoaded.current) {
-      localStorage.setItem("viagem_mala_v2", JSON.stringify(itensMala));
+  // 2. Função de Salvar com Tipagem Estrita
+  const salvarViagens = async (novaMala: ItemMala[]) => {
+    try {
+      const token = localStorage.getItem("token");
+      
+      // O Payload deve bater com o que o Backend espera
+      const payload = { mala: novaMala };
+
+      await axios.put(`${API_URL}/progress/viagens`, payload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      await refreshUser(); // Sincroniza o Contexto Global
+    } catch (error) {
+      console.error("Erro ao salvar mala no banco:", error);
     }
-  }, [itensMala]);
+  };
 
   const adicionarItem = () => {
-    if (!novoItem) return;
+    if (!novoItem.trim()) return;
+    
     const novo: ItemMala = { 
       id: Date.now().toString(), 
       texto: novoItem, 
-      check: false,
+      check: false, 
       categoria: categoriaSel 
     };
-    setItensMala(prev => [...prev, novo]);
+
+    salvarViagens([...mala, novo]);
     setNovoItem("");
   };
 
   const toggleItem = (id: string) => {
-    setItensMala(prev => prev.map(i => i.id === id ? { ...i, check: !i.check } : i));
+    const novaMala = mala.map(item => 
+      item.id === id ? { ...item, check: !item.check } : item
+    );
+    salvarViagens(novaMala);
   };
 
-  const progressoMala = itensMala.length > 0 
-    ? (itensMala.filter(i => i.check).length / itensMala.length) * 100 
+  const excluirItem = (id: string) => {
+    const novaMala = mala.filter(item => item.id !== id);
+    salvarViagens(novaMala);
+  };
+
+  const progressoMala = mala.length > 0 
+    ? (mala.filter(i => i.check).length / mala.length) * 100 
     : 0;
 
   const sitesUteis = [
@@ -95,20 +106,12 @@ export default function Viagens() {
         <Cardprogresso 
           title="Itens na Mala" 
           icon={<Backpack size={20} className="text-blue-400" />} 
-          progressoDodia={`${itensMala.filter(i => i.check).length}/${itensMala.length}`} 
-          progresso={progressoMala}
-          barraDeProgresso={true}
+          progressoDodia={`${mala.filter(i => i.check).length}/${mala.length}`} 
+          progresso={progressoMala} 
+          barraDeProgresso 
         />
-        <Cardprogresso 
-          title="Compras" 
-          icon={<ShoppingBag size={20} className="text-pink-400" />} 
-          porcentagem="Ver Sites" 
-        />
-        <Cardprogresso 
-          title="Dicas" 
-          icon={<Info size={20} className="text-yellow-500" />} 
-          porcentagem="Checklist" 
-        />
+        <Cardprogresso title="Compras" icon={<ShoppingBag size={20} className="text-pink-400" />} porcentagem="Ver Sites" />
+        <Cardprogresso title="Dicas" icon={<Info size={20} className="text-yellow-500" />} porcentagem="Checklist" />
       </div>
 
       <GrayMenu items={[
@@ -117,31 +120,34 @@ export default function Viagens() {
         { title: "Infos Úteis", onClick: () => setActive("Infos"), active: active === "Infos" },
       ]} />
 
-      <div className="mt-6">
+      <div className="mt-6 pb-10">
         {active === "Mala" && (
           <div className="bg-white p-6 rounded-[2.5rem] border-2 border-pink-50 shadow-sm">
-            <h3 className="font-black text-pink-400 mb-6 flex items-center gap-2 uppercase text-xs tracking-widest">
+            <h3 className="font-black text-pink-400 mb-6 flex items-center gap-2 uppercase text-xs tracking-widest font-sans">
               <CheckSquare size={18} /> Checklist de Viagem
             </h3>
             
             <div className="flex flex-col md:flex-row gap-2 mb-8">
               <input 
                 type="text" 
-                value={novoItem}
+                value={novoItem} 
                 onChange={(e) => setNovoItem(e.target.value)}
-                placeholder="O que não pode esquecer?"
-                className="flex-1 p-4 bg-pink-50/30 rounded-2xl outline-none border border-pink-100"
+                placeholder="O que não pode esquecer?" 
+                className="flex-1 p-4 bg-pink-50/30 rounded-2xl outline-none border border-pink-100 text-gray-700" 
               />
+              
               <select 
-                value={categoriaSel}
+                value={categoriaSel} 
                 onChange={(e) => setCategoriaSel(e.target.value as CategoriaMala)}
                 className="p-4 bg-white border border-pink-100 rounded-2xl font-bold text-xs text-pink-400 outline-none"
               >
-                {categorias.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
+                {categorias.map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
-              <button onClick={adicionarItem} className="p-4 bg-pink-400 text-white rounded-2xl hover:scale-105 transition-all">
+
+              <button 
+                onClick={adicionarItem} 
+                className="p-4 bg-pink-400 text-white rounded-2xl hover:scale-105 transition-all shadow-md active:scale-95"
+              >
                 <Plus size={24} />
               </button>
             </div>
@@ -151,20 +157,21 @@ export default function Viagens() {
                 <div key={cat}>
                   <h4 className="text-[10px] font-black text-gray-300 uppercase mb-3 ml-2 tracking-tighter">{cat}</h4>
                   <div className="space-y-2">
-                    {itensMala.filter(i => i.categoria === cat).map(item => (
-                      <div 
-                        key={item.id}
-                        className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${
-                          item.check ? 'bg-green-50/50 border-green-100 opacity-50' : 'bg-gray-50 border-gray-100'
-                        }`}
-                      >
+                    {mala.filter(i => i.categoria === cat).map(item => (
+                      <div key={item.id} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${
+                        item.check ? 'bg-green-50/50 border-green-100 opacity-60' : 'bg-gray-50 border-gray-100'
+                      }`}>
                         <div className="flex items-center gap-3 cursor-pointer flex-1" onClick={() => toggleItem(item.id)}>
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${item.check ? 'bg-green-400 border-green-400' : 'border-gray-200'}`}>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                            item.check ? 'bg-green-400 border-green-400' : 'border-gray-200 bg-white'
+                          }`}>
                             {item.check && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                           </div>
-                          <span className={`font-bold text-sm ${item.check ? 'line-through text-gray-400' : 'text-gray-600'}`}>{item.texto}</span>
+                          <span className={`font-bold text-sm ${item.check ? 'line-through text-gray-400' : 'text-gray-600'}`}>
+                            {item.texto}
+                          </span>
                         </div>
-                        <button onClick={() => setItensMala(prev => prev.filter(i => i.id !== item.id))}>
+                        <button onClick={() => excluirItem(item.id)} className="hover:scale-110 transition-transform">
                           <Trash2 size={16} className="text-gray-300 hover:text-red-400" />
                         </button>
                       </div>
@@ -179,14 +186,9 @@ export default function Viagens() {
         {active === "Compras" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {sitesUteis.map((site) => (
-              <a 
-                key={site.nome} 
-                href={site.url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="bg-white p-6 rounded-[2rem] border-2 border-blue-50 hover:border-blue-300 transition-all group"
-              >
-                <div className="bg-blue-50 w-12 h-12 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-500 group-hover:text-white transition-all text-blue-500">
+              <a key={site.nome} href={site.url} target="_blank" rel="noopener noreferrer"
+                className="bg-white p-6 rounded-[2rem] border-2 border-blue-50 hover:border-blue-200 transition-all hover:shadow-lg group">
+                <div className="bg-blue-50 w-12 h-12 rounded-full flex items-center justify-center mb-4 text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all">
                    <ExternalLink size={20} />
                 </div>
                 <h4 className="font-black text-gray-700">{site.nome}</h4>
@@ -201,12 +203,14 @@ export default function Viagens() {
           <div className="bg-white p-8 rounded-[3rem] border-2 border-yellow-50 max-w-2xl mx-auto shadow-sm">
              <div className="flex items-center gap-4 mb-6 text-yellow-500">
                <Plane size={32} />
-               <h3 className="text-xl font-black uppercase">Guia Rápido</h3>
+               <h3 className="text-xl font-black uppercase font-sans">Guia Rápido</h3>
              </div>
              <div className="space-y-4 text-sm text-gray-500">
-                <div className="p-4 bg-yellow-50 rounded-2xl">
-                  <p className="font-bold text-yellow-700">📌 Dica de Ouro:</p>
-                  <p>Sempre tire foto dos seus documentos antes de viajar!</p>
+                <div className="p-5 bg-yellow-50 rounded-[2rem] border border-yellow-100">
+                  <p className="font-bold text-yellow-700 mb-1 flex items-center gap-2">
+                    <Info size={16}/> Dica de Ouro:
+                  </p>
+                  <p>Sempre tire foto dos seus documentos e guarde na nuvem antes de viajar!</p>
                 </div>
              </div>
           </div>

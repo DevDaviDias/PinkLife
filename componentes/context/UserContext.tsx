@@ -87,6 +87,18 @@ interface AlimentacaoData {
   compras: ItemCompra[];
 }
 
+// 1. Defina as interfaces acima da UserProgress
+interface ItemMala {
+  id: string;
+  texto: string;
+  check: boolean;
+  categoria: "Roupas" | "Higiene" | "Documentos" | "Outros";
+}
+
+interface ViagensData {
+  mala: ItemMala[];
+}
+
 interface UserProgress {
   saude?: Record<string, RegistroSaude>;
   financas?: Transacao[]; 
@@ -101,7 +113,8 @@ interface UserProgress {
     horario: string 
   }[];
  beleza?: BelezaData; 
-  alimentacao?: AlimentacaoData; // <--- ADICIONADO// <--- ADICIONE ESTA LINHA AQUI
+  alimentacao?: AlimentacaoData;
+  viagens?: ViagensData; // <--- ADICIONADO // <--- ADICIONADO// <--- ADICIONE ESTA LINHA AQUI
 }
 
 // --- 3. Interface do Usuário e do Contexto ---
