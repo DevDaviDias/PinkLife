@@ -4,8 +4,9 @@ import { Moon, Bell, Trash2, ShieldAlert, LogOut } from "lucide-react";
 import { useState } from "react";
 import ContainerPages from "@/componentes/ui/ContainerPages";
 import Cabecalho from "../ui/Cabecalho";
-import StatusCard from "../ui/StatusCard "; // Verifique se o arquivo tem esse espaço no final "StatusCard .tsx"
+import StatusCard from "../ui/StatusCard "; // Verifique se o arquivo tem esse espaço no final 
 import { useRouter } from "next/navigation";
+import TestApi from "@/componentes/testapi/testApi"
 
 export default function Configuracoes() {
   const [darkMode, setDarkMode] = useState(false);
