@@ -34,7 +34,51 @@ interface Treino {
 
 export default function Dashboard() {
   const { user, refreshUser } = useUser();
-  const userName = user?.name || "Bem-vinda";
+  const userName = user?.name || "Visitante";
+
+  // --- Lógica de Mensagem Personalizada e Gênero ---
+  const [saudacao, setSaudacao] = useState("");
+
+  useEffect(() => {
+    const obterSaudacao = () => {
+      const hora = new Date().getHours();
+      const isFeminino = true; // Você pode puxar isso do user.genero se tiver no banco
+
+      // Define o período
+      let periodo = "";
+      if (hora >= 5 && hora < 12) periodo = "Bom dia";
+      else if (hora >= 12 && hora < 18) periodo = "Boa tarde";
+      else periodo = "Boa noite";
+
+      // Lista de mensagens aleatórias
+      const mimos = [
+        "Pronta para brilhar?",
+        "Que seu dia seja doce!",
+        "Vamos conquistar o mundo?",
+        "Foco e muita luz!",
+        "Você é incrível!",
+        "Dia de realizar sonhos!"
+      ];
+      
+      const mimosHomem = [
+        "Bora pra cima!",
+        "Foco na missão!",
+        "Dia de produtividade!",
+        "Pronto para o progresso?",
+        "Mantenha a disciplina!"
+      ];
+
+      // Se quiser detectar homem, pode checar uma prop do usuário
+      // Aqui usamos um "🌸" por padrão, mas se for homem podemos trocar por "🚀"
+      const mimoselect = isFeminino 
+        ? mimos[Math.floor(Math.random() * mimos.length)]
+        : mimosHomem[Math.floor(Math.random() * mimosHomem.length)];
+
+      setSaudacao(`${periodo}, ${userName}! ${mimoselect}`);
+    };
+
+    obterSaudacao();
+  }, [userName]);
 
   // Estados para os Cards
   const [estudosStats, setEstudosStats] = useState({ horasLabel: "0.0h / 0h", porcentagem: 0 });
@@ -42,27 +86,22 @@ export default function Dashboard() {
   const [habitosStats, setHabitosStats] = useState({ label: "Sem registros", porcentagem: 0 });
   const [tarefasStats, setTarefasStats] = useState({ label: "0 pendentes", porcentagem: 0 });
 
-  // 1. Forçar atualização ao montar o Dashboard
   useEffect(() => {
     refreshUser();
-  },[]);
+  }, []);
 
-  // 2. Processar os dados sempre que o 'user' mudar
   useEffect(() => {
     if (!user?.progress) return;
-
     const { progress } = user;
 
     // --- Lógica de Estudos ---
     const materias = (progress.materias as Materia[]) || [];
-  const tHoras = materias.reduce((acc, m) => acc + (Number(m.horasEstudadas) || 0), 0);
-  const tMeta = materias.reduce((acc, m) => acc + (Number(m.metaHoras) || 0), 0);
-    
-    
-   setEstudosStats({
-    horasLabel: `${tHoras.toFixed(1)}h / ${tMeta.toFixed(0)}h`,
-    porcentagem: tMeta > 0 ? Math.min((tHoras / tMeta) * 100, 100) : 0,
-  });
+    const tHoras = materias.reduce((acc, m) => acc + (Number(m.horasEstudadas) || 0), 0);
+    const tMeta = materias.reduce((acc, m) => acc + (Number(m.metaHoras) || 0), 0);
+    setEstudosStats({
+      horasLabel: `${tHoras.toFixed(1)}h / ${tMeta.toFixed(0)}h`,
+      porcentagem: tMeta > 0 ? Math.min((tHoras / tMeta) * 100, 100) : 0,
+    });
 
     // --- Lógica de Treinos ---
     const treinos = (progress.treinos as Treino[]) || [];
@@ -79,27 +118,24 @@ export default function Dashboard() {
       porcentagem: totalSaude > 0 ? 100 : 0,
     });
 
-    // --- Lógica de Tarefas (Agenda) ---
-    // Substituído 'any' por 'Tarefa[]'
-    const tarefas = (progress.tarefas as Tarefa[]) || []; // Aqui o módulo chama 'tarefas'
-  const concluidasT = tarefas.filter(t => t.concluida).length;
-  const totalT = tarefas.length;
-  
-    
-  setTarefasStats({
-    label: totalT - concluidasT > 0 ? `${totalT - concluidasT} pendentes` : totalT > 0 ? "Tudo feito! ✨" : "Sem tarefas",
-    porcentagem: totalT > 0 ? (concluidasT / totalT) * 100 : 0,
-  });
-
+    // --- Lógica de Tarefas ---
+    const tarefas = (progress.tarefas as Tarefa[]) || [];
+    const concluidasT = tarefas.filter(t => t.concluida).length;
+    const totalT = tarefas.length;
+    setTarefasStats({
+      label: totalT - concluidasT > 0 ? `${totalT - concluidasT} pendentes` : totalT > 0 ? "Tudo feito! ✨" : "Sem tarefas",
+      porcentagem: totalT > 0 ? (concluidasT / totalT) * 100 : 0,
+    });
   }, [user]);
 
   return (
     <ContainerPages>
-      <Cabecalho title={`Olá, ${userName}! 🌸`} imageSrc={"/images/hello-kitty-dashboard.jpg"}>
+      {/* O Título agora usa a saudação dinâmica */}
+      <Cabecalho title={saudacao} imageSrc={"/images/hello-kitty-dashboard.jpg"}>
         <DateComponent />
       </Cabecalho>
 
-      {/* Grid de Cards de Progresso */}
+      {/* Grid de Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 mt-4 gap-[0.6em] justify-center md:gap-4">
         <Cardprogresso 
           title="Saúde" 
@@ -131,7 +167,6 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Seção Inferior: Agenda e Conquistas */}
       <div className="flex-col mb-4 flex gap-4 mt-[1.2em] md:mb-0 md:mt-[2em] md:flex-row">
         <div className="flex-1">
           <Agenda />
