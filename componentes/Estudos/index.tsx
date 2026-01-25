@@ -202,7 +202,7 @@ export default function Estudos() {
                   </button>
                 </div>
 
-                <div className="mt-8 grid grid-cols-1 gap-4">
+                <div className="mt-8 md:mt-16 grid grid-cols-1 gap-4">
                   {materias.length === 0 && (
                     <p className="text-center text-gray-400 py-10 border-2 border-dashed rounded-xl">Nenhuma matéria cadastrada ainda.</p>
                   )}
@@ -230,7 +230,7 @@ export default function Estudos() {
             {/* ABA: CRONÔMETRO */}
             {active === "Semana" && (
               <div className="flex justify-center">
-                <StatusCard2 title="Focar nos Estudos">
+                <StatusCard2 title="">
                   <CronometroEstudos 
                     materias={materias.map((m) => m.nome)} 
                     onFinalizar={finalizarSessao} 

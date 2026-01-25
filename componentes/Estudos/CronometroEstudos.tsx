@@ -63,7 +63,7 @@ export default function CronometroEstudos({
     const h = Math.floor(seg / 3600);
     const m = Math.floor((seg % 3600) / 60);
     const s = seg % 60;
-    
+
     // Formatação melhorada: se tiver mais de uma hora, mostra horas também
     if (h > 0) {
       return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
@@ -74,7 +74,7 @@ export default function CronometroEstudos({
   const cronometroBloqueado = materia === "";
 
   return (
-    <div className="space-y-3 w-full max-w-sm mx-auto"> 
+    <div className="space-y-2 w-full max-w-sm mx-auto">
       {cronometroBloqueado && (
         <div className="flex items-center gap-2 text-xs text-pink-400 justify-center animate-pulse">
           <AlertCircle size={14} />
@@ -85,7 +85,7 @@ export default function CronometroEstudos({
       <div className={`text-center text-[3rem] font-mono font-bold transition-colors ${cronometroBloqueado ? "text-gray-300" : "text-pink-500"}`}>
         {formatar(tempo)}
       </div>
-      
+
       <select
         value={materia}
         onChange={(e) => setMateria(e.target.value)}
@@ -99,23 +99,22 @@ export default function CronometroEstudos({
         ))}
       </select>
 
-      <div className="flex justify-center gap-4 py-2">
+      <div className="flex justify-center gap-4 ">
         {!rodando ? (
           <button
             onClick={() => setRodando(true)}
             disabled={cronometroBloqueado}
-            className={`p-5 rounded-full shadow-md transition-all ${
-              cronometroBloqueado 
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
+            className={`p-5 rounded-full shadow-md transition-all ${cronometroBloqueado
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                 : "bg-pink-100 text-pink-500 hover:scale-105 active:scale-95"
-            }`}
+              }`}
           >
             <Play size={24} fill="currentColor" />
           </button>
         ) : (
           <button
             onClick={() => setRodando(false)}
-            className="bg-pink-500 text-white p-5 rounded-full hover:bg-pink-600 transition-all shadow-lg shadow-pink-200 hover:scale-105 active:scale-95"
+            className="bg-pink-500 text-white p-3 rounded-full hover:bg-pink-600 transition-all shadow-lg shadow-pink-200 hover:scale-105 active:scale-95"
           >
             <Pause size={24} fill="currentColor" />
           </button>
@@ -124,16 +123,15 @@ export default function CronometroEstudos({
         <button
           onClick={finalizar}
           disabled={cronometroBloqueado || tempo === 0}
-          className={`p-5 rounded-full shadow-md transition-all ${
-            cronometroBloqueado || tempo === 0
-              ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
+          className={`p-5 rounded-full shadow-md transition-all ${cronometroBloqueado || tempo === 0
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
               : "bg-red-100 text-red-500 hover:bg-red-200 hover:scale-105 active:scale-95"
-          }`}
+            }`}
         >
           <StopCircle size={24} fill="currentColor" />
         </button>
       </div>
-      
+
       <input
         placeholder="O que estudamos hoje?"
         value={comentario}
