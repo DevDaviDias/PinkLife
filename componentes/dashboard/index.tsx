@@ -55,13 +55,14 @@ export default function Dashboard() {
 
     // --- Lógica de Estudos ---
     const materias = (progress.materias as Materia[]) || [];
-    const tHoras = materias.reduce((acc, m) => acc + (Number(m.horasEstudadas) || 0), 0);
-    const tMeta = materias.reduce((acc, m) => acc + (Number(m.metaHoras) || 0), 0);
+  const tHoras = materias.reduce((acc, m) => acc + (Number(m.horasEstudadas) || 0), 0);
+  const tMeta = materias.reduce((acc, m) => acc + (Number(m.metaHoras) || 0), 0);
     
-    setEstudosStats({
-      horasLabel: `${tHoras.toFixed(1)}h / ${tMeta.toFixed(0)}h`,
-      porcentagem: tMeta > 0 ? Math.min((tHoras / tMeta) * 100, 100) : 0,
-    });
+    
+   setEstudosStats({
+    horasLabel: `${tHoras.toFixed(1)}h / ${tMeta.toFixed(0)}h`,
+    porcentagem: tMeta > 0 ? Math.min((tHoras / tMeta) * 100, 100) : 0,
+  });
 
     // --- Lógica de Treinos ---
     const treinos = (progress.treinos as Treino[]) || [];
@@ -80,15 +81,15 @@ export default function Dashboard() {
 
     // --- Lógica de Tarefas (Agenda) ---
     // Substituído 'any' por 'Tarefa[]'
-    const tarefas = (progress.tarefas as Tarefa[]) || [];
-    const concluidasT = tarefas.filter(t => t.concluida).length;
-    const totalT = tarefas.length;
-    const pendentes = totalT - concluidasT;
+    const tarefas = (progress.tarefas as Tarefa[]) || []; // Aqui o módulo chama 'tarefas'
+  const concluidasT = tarefas.filter(t => t.concluida).length;
+  const totalT = tarefas.length;
+  
     
-    setTarefasStats({
-      label: pendentes > 0 ? `${pendentes} pendentes` : totalT > 0 ? "Tudo feito! ✨" : "Sem tarefas",
-      porcentagem: totalT > 0 ? (concluidasT / totalT) * 100 : 0,
-    });
+  setTarefasStats({
+    label: totalT - concluidasT > 0 ? `${totalT - concluidasT} pendentes` : totalT > 0 ? "Tudo feito! ✨" : "Sem tarefas",
+    porcentagem: totalT > 0 ? (concluidasT / totalT) * 100 : 0,
+  });
 
   }, [user]);
 

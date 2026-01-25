@@ -113,6 +113,7 @@ export default function Configuracoes() {
           </div>
         </StatusCard>
       </div>
+      <TestApi/>
     </ContainerPages>
   );
 }
