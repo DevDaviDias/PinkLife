@@ -1,7 +1,6 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useState, useEffect, useRef, ReactNode } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import axios from "axios";
 import { 
   format, addMonths, subMonths, startOfMonth, endOfMonth, 
@@ -11,16 +10,18 @@ import { ptBR } from "date-fns/locale";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ChevronLeft, ChevronRight, X, Thermometer, Droplets, 
-  Brain, Wind, Smile, Sparkles
+  Brain, Wind, Smile
 } from "lucide-react";
 
 import ContainerPages from "../ui/ContainerPages";
 import Cabecalho from "../ui/Cabecalho";
 import GrayMenu from "@/componentes/ui/GrayMenu";
+import { useUser } from "@/componentes/context/UserContext";
 
-const API_URL = "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-// --- Interfaces de Dados ---
+// --- 1. Definições de Tipos Estritos (Sem ANY) ---
+
 interface Sintomas {
   dorDeCabeca: boolean;
   colica: boolean;
@@ -36,96 +37,99 @@ interface RegistroDia {
   notas: string;
 }
 
-// --- Interfaces de Props ---
-interface CalendarioProps {
-  currentMonth: Date;
-  registros: Record<string, RegistroDia>;
-  onSelect: (data: string) => void;
-}
-
-interface ModalSintomasProps {
-  dia: string | null;
-  registros: Record<string, RegistroDia>;
-  onClose: () => void;
-  onUpdate: (data: string, updates: Partial<RegistroDia>) => void;
-}
+// Representa a estrutura crua que vem do MongoDB/Contexto
+type SaudeRawData = Record<string, {
+  data?: string;
+  menstruando?: boolean;
+  notas?: string;
+  sintomas?: Partial<Sintomas>;
+}>;
 
 interface SintomaBotaoProps {
   label: string;
   icon: ReactNode;
-  active: boolean | undefined;
+  active: boolean;
   onClick: () => void;
   color: "amber" | "purple" | "blue" | "green";
 }
 
+// --- 2. Componente Principal ---
+
 export default function Saude() {
+  const { user, refreshUser } = useUser();
   const [active, setActive] = useState("Calendário");
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  
+  // Estado tipado corretamente
   const [registros, setRegistros] = useState<Record<string, RegistroDia>>({});
   const [diaSelecionado, setDiaSelecionado] = useState<string | null>(null);
-  const isLoaded = useRef(false);
 
-  const [analisando, setAnalisando] = useState(false);
-  const [relatorioIA, setRelatorioIA] = useState<string | null>(null);
+  // --- 3. Sincronização de Dados ---
+useEffect(() => {
+    // 1. Verificamos se os dados existem e os tratamos como um objeto de chaves string
+    const rawSaude = user?.progress?.saude as Record<string, any> | undefined;
 
-  // --- CARREGAR DADOS DO BANCO ---
-  useEffect(() => {
-    const carregarDados = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-      try {
-        const res = await axios.get(`${API_URL}/saude`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setRegistros(res.data || {});
-        isLoaded.current = true;
-      } catch (err) {
-        console.error("Erro ao carregar saúde:", err);
-      }
-    };
-    carregarDados();
-  }, []);
+    if (rawSaude) {
+      // 2. AQUI ESTÁ O SEGREDO: Definimos explicitamente que 'formatados' 
+      // é um registro de RegistroDia. Isso elimina o erro no setRegistros.
+      const formatados: Record<string, RegistroDia> = {};
 
-  // --- ATUALIZAR DIA (SALVAR NO BANCO) ---
+      Object.keys(rawSaude).forEach((key) => {
+        const item = rawSaude[key];
+        
+        // 3. Garantimos que cada campo obrigatório da interface existe
+        formatados[key] = {
+          data: item.data || key,
+          menstruando: !!item.menstruando,
+          notas: item.notas || "",
+          sintomas: {
+            dorDeCabeca: !!item.sintomas?.dorDeCabeca,
+            colica: !!item.sintomas?.colica,
+            inchaco: !!item.sintomas?.inchaco,
+            seiosSensiveis: !!item.sintomas?.seiosSensiveis,
+            humorInstavel: !!item.sintomas?.humorInstavel,
+          },
+        };
+      });
+
+      // Agora o TypeScript entende que o objeto inteiro é compatível
+      setRegistros(formatados);
+    }
+  }, [user]);
+
+  // --- 4. Função de Salvar ---
   const atualizarDia = async (data: string, updates: Partial<RegistroDia>) => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
     const diaAtual = registros[data] || { 
-      data, menstruando: false, notas: "", 
+      data, 
+      menstruando: false, 
+      notas: "", 
       sintomas: { dorDeCabeca: false, colica: false, inchaco: false, seiosSensiveis: false, humorInstavel: false } 
     };
 
-    const novoRegistro = { ...diaAtual, ...updates };
-
-    // Atualização Otimista (UI primeiro)
-    setRegistros(prev => ({ ...prev, [data]: novoRegistro }));
+    const novoRegistro: RegistroDia = { 
+        ...diaAtual, 
+        ...updates,
+        sintomas: { ...diaAtual.sintomas, ...(updates.sintomas || {}) }
+    };
 
     try {
       await axios.post(`${API_URL}/saude`, novoRegistro, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      await refreshUser();
     } catch (err) {
-      console.error("Erro ao salvar dia:", err);
+      console.error("Erro ao salvar dados de saúde:", err);
     }
-  };
-
-  const gerarAnaliseIA = () => {
-    setAnalisando(true);
-    setTimeout(() => {
-      const lista = Object.values(registros);
-      let msg = "Ciclo estável. ";
-      if (lista.filter(r => r.sintomas.colica).length > 3) msg += "Notei cólicas frequentes.";
-      setRelatorioIA(msg);
-      setAnalisando(false);
-    }, 2000);
   };
 
   return (
     <ContainerPages>
       <div className="-mt-4">
-        <Cabecalho title="Saúde Pro 🌸">
-          <p className="text-sm">Seu diário inteligente</p>
+        <Cabecalho title="Minha Saúde 🌸">
+          <p className="text-sm opacity-70">Acompanhe seu ciclo e bem-estar</p>
         </Cabecalho>
       </div>
 
@@ -133,48 +137,49 @@ export default function Saude() {
         <GrayMenu items={[
           { title: "Calendário", onClick: () => setActive("Calendário"), active: active === "Calendário" },
           { title: "Histórico", onClick: () => setActive("Histórico"), active: active === "Histórico" },
-          { title: "Análise IA", onClick: () => setActive("Análise"), active: active === "Análise" },
         ]} />
       </div>
 
       <div className="mt-6 mb-24">
         {active === "Calendário" && (
            <div className="max-w-xl mx-auto px-1">
-             <div className="flex justify-between items-center mb-4">
-               <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-1 text-pink-400"><ChevronLeft /></button>
-               <h3 className="font-bold text-gray-700 uppercase text-xs tracking-widest">{format(currentMonth, "MMMM yyyy", { locale: ptBR })}</h3>
-               <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-1 text-pink-400"><ChevronRight /></button>
+             <div className="flex justify-between items-center mb-6 px-2">
+               <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-2 text-pink-500 hover:bg-pink-50 rounded-full transition-all"><ChevronLeft /></button>
+               <h3 className="font-bold text-gray-700 uppercase text-xs tracking-[0.2em]">
+                 {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
+               </h3>
+               <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-2 text-pink-500 hover:bg-pink-50 rounded-full transition-all"><ChevronRight /></button>
              </div>
-             <Calendario currentMonth={currentMonth} registros={registros} onSelect={setDiaSelecionado} />
+             
+             <CalendarioComp currentMonth={currentMonth} registros={registros} onSelect={setDiaSelecionado} />
            </div>
         )}
 
         {active === "Histórico" && (
-          <div className="max-w-2xl mx-auto px-2 overflow-hidden">
-            <div className="bg-white rounded-[2rem] border border-pink-100 overflow-hidden shadow-sm">
-              <table className="w-full text-left border-collapse">
-                <thead className="bg-pink-50">
+          <div className="max-w-2xl mx-auto px-2">
+            <div className="bg-white rounded-[2.5rem] border border-pink-100 overflow-hidden shadow-sm">
+              <table className="w-full text-left">
+                <thead className="bg-pink-50/30">
                   <tr>
-                    <th className="p-4 text-[10px] font-black text-pink-400 uppercase">Data</th>
-                    <th className="p-4 text-[10px] font-black text-pink-400 uppercase text-center">Fluxo</th>
-                    <th className="p-4 text-[10px] font-black text-pink-400 uppercase">Sintomas/Notas</th>
+                    <th className="p-5 text-[10px] font-black text-pink-500 uppercase">Data</th>
+                    <th className="p-5 text-[10px] font-black text-pink-500 uppercase text-center">Fluxo</th>
+                    <th className="p-5 text-[10px] font-black text-pink-500 uppercase">Sintomas</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-pink-50">
                   {Object.values(registros)
                     .sort((a, b) => b.data.localeCompare(a.data))
                     .map((reg) => (
-                      <tr key={reg.data} className="active:bg-gray-50 transition-colors cursor-pointer" onClick={() => setDiaSelecionado(reg.data)}>
-                        <td className="p-4"><span className="text-xs font-bold text-gray-700">{format(parseISO(reg.data), "dd/MM")}</span></td>
-                        <td className="p-4 text-center">{reg.menstruando && <Droplets size={16} className="text-pink-500 mx-auto" />}</td>
-                        <td className="p-4">
-                          <div className="flex flex-wrap gap-1 mb-1">
+                      <tr key={reg.data} className="hover:bg-pink-50/20 transition-colors cursor-pointer" onClick={() => setDiaSelecionado(reg.data)}>
+                        <td className="p-5 font-bold text-gray-600 text-xs">{format(parseISO(reg.data), "dd/MM/yy")}</td>
+                        <td className="p-5 text-center">{reg.menstruando && <Droplets size={18} className="text-pink-500 mx-auto" />}</td>
+                        <td className="p-5">
+                          <div className="flex flex-wrap gap-1">
                             {reg.sintomas.colica && <div className="w-2 h-2 rounded-full bg-amber-400" />}
                             {reg.sintomas.dorDeCabeca && <div className="w-2 h-2 rounded-full bg-purple-400" />}
                             {reg.sintomas.inchaco && <div className="w-2 h-2 rounded-full bg-blue-400" />}
                             {reg.sintomas.humorInstavel && <div className="w-2 h-2 rounded-full bg-green-400" />}
                           </div>
-                          {reg.notas && <p className="text-[10px] text-gray-400 italic line-clamp-1">{reg.notas}</p>}
                         </td>
                       </tr>
                     ))}
@@ -197,14 +202,14 @@ export default function Saude() {
 
 // --- SUBCOMPONENTES ---
 
-function Calendario({ currentMonth, registros, onSelect }: CalendarioProps) {
+function CalendarioComp({ currentMonth, registros, onSelect }: { currentMonth: Date, registros: Record<string, RegistroDia>, onSelect: (d: string) => void }) {
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
   const startDate = startOfWeek(monthStart);
   const endDate = endOfWeek(monthEnd);
 
-  const rows = [];
-  let days = [];
+  const rows: ReactNode[] = [];
+  let days: ReactNode[] = [];
   let day = startDate;
 
   while (day <= endDate) {
@@ -214,9 +219,21 @@ function Calendario({ currentMonth, registros, onSelect }: CalendarioProps) {
       const isCurrentMonth = isSameMonth(day, monthStart);
 
       days.push(
-        <div key={dStr} onClick={() => onSelect(dStr)} className={`aspect-square p-0.5 relative cursor-pointer border-[0.5px] border-pink-50/30 flex flex-col items-center justify-center ${!isCurrentMonth ? "opacity-10" : "opacity-100"}`}>
-          {reg?.menstruando && <div className="absolute inset-1.5 bg-pink-400 rounded-xl" />}
-          <span className={`relative text-xs font-bold z-10 ${reg?.menstruando ? "text-white" : "text-gray-500"}`}>{format(day, "d")}</span>
+        <div 
+          key={dStr} 
+          onClick={() => isCurrentMonth && onSelect(dStr)} 
+          className={`aspect-square p-1 relative cursor-pointer border-[0.5px] border-pink-50/20 flex flex-col items-center justify-center transition-all ${!isCurrentMonth ? "opacity-10 pointer-events-none" : "hover:bg-pink-50"}`}
+        >
+          {reg?.menstruando && (
+            <motion.div layoutId="menstru" className="absolute inset-1.5 bg-pink-400 rounded-2xl shadow-inner" />
+          )}
+          <span className={`relative text-xs font-bold z-10 ${reg?.menstruando ? "text-white" : "text-gray-500"}`}>
+            {format(day, "d")}
+          </span>
+          <div className="flex gap-0.5 mt-0.5 relative z-10">
+             {reg?.sintomas.colica && <div className="w-1 h-1 rounded-full bg-amber-400" />}
+             {reg?.sintomas.dorDeCabeca && <div className="w-1 h-1 rounded-full bg-purple-400" />}
+          </div>
         </div>
       );
       day = addDays(day, 1);
@@ -224,34 +241,49 @@ function Calendario({ currentMonth, registros, onSelect }: CalendarioProps) {
     rows.push(<div className="grid grid-cols-7" key={day.getTime()}>{days}</div>);
     days = [];
   }
-  return <div className="bg-white rounded-3xl overflow-hidden border border-pink-100">{rows}</div>;
+  return <div className="bg-white rounded-[2.5rem] overflow-hidden border border-pink-100 shadow-sm">{rows}</div>;
 }
 
-function ModalSintomas({ dia, registros, onClose, onUpdate }: ModalSintomasProps) {
+function ModalSintomas({ dia, registros, onClose, onUpdate }: { dia: string | null, registros: Record<string, RegistroDia>, onClose: () => void, onUpdate: (d: string, u: Partial<RegistroDia>) => Promise<void> }) {
   if (!dia) return null;
-  const reg = registros[dia] || { menstruando: false, notas: "", sintomas: { dorDeCabeca: false, colica: false, inchaco: false, humorInstavel: false, seiosSensiveis: false } };
+  const reg = registros[dia] || { 
+    menstruando: false, 
+    notas: "", 
+    sintomas: { dorDeCabeca: false, colica: false, inchaco: false, humorInstavel: false, seiosSensiveis: false } 
+  };
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-        <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} className="relative bg-white w-full max-w-lg rounded-t-[2.5rem] p-6 shadow-2xl">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-black">{format(parseISO(dia), "dd 'de' MMMM", { locale: ptBR })}</h2>
-            <button onClick={onClose} className="p-2 bg-gray-50 rounded-full"><X size={20}/></button>
+      <div className="fixed inset-0 z-[120] flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/40 backdrop-blur-md" />
+        <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} className="relative bg-white w-full max-w-md rounded-t-[3rem] sm:rounded-[3rem] p-8 shadow-2xl">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-xl font-black text-gray-800">{format(parseISO(dia), "dd 'de' MMMM", { locale: ptBR })}</h2>
+            <button onClick={onClose} className="p-2 bg-gray-100 rounded-full text-gray-400"><X size={20}/></button>
           </div>
-          <div className="space-y-4">
-             <button onClick={() => onUpdate(dia, { menstruando: !reg.menstruando })} className={`w-full p-4 rounded-2xl border-2 flex justify-between items-center ${reg.menstruando ? 'border-pink-400 bg-pink-50' : 'border-gray-50'}`}>
-                <span className="font-bold text-sm flex items-center gap-2"><Droplets size={18} className="text-pink-500"/> Fluxo Menstrual</span>
-                <div className={`w-4 h-4 rounded-full ${reg.menstruando ? 'bg-pink-400' : 'bg-gray-200'}`} />
+          
+          <div className="space-y-6">
+             <button 
+                onClick={() => onUpdate(dia, { menstruando: !reg.menstruando })} 
+                className={`w-full p-5 rounded-[2rem] border-2 flex justify-between items-center transition-all ${reg.menstruando ? 'border-pink-400 bg-pink-50' : 'border-gray-50 bg-gray-50'}`}
+             >
+                <span className="font-bold text-pink-600 flex items-center gap-3"><Droplets size={22}/> Fluxo Menstrual</span>
+                <div className={`w-6 h-6 rounded-full border-2 ${reg.menstruando ? 'bg-pink-500 border-pink-500' : 'bg-white border-gray-200'}`} />
              </button>
-             <div className="grid grid-cols-2 gap-2">
-                <SintomaBotao label="Cólica" icon={<Thermometer size={14}/>} active={reg.sintomas?.colica} onClick={() => onUpdate(dia, { sintomas: { ...reg.sintomas, colica: !reg.sintomas?.colica } })} color="amber" />
-                <SintomaBotao label="Cabeça" icon={<Brain size={14}/>} active={reg.sintomas?.dorDeCabeca} onClick={() => onUpdate(dia, { sintomas: { ...reg.sintomas, dorDeCabeca: !reg.sintomas?.dorDeCabeca } })} color="purple" />
-                <SintomaBotao label="Inchaço" icon={<Wind size={14}/>} active={reg.sintomas?.inchaco} onClick={() => onUpdate(dia, { sintomas: { ...reg.sintomas, inchaco: !reg.sintomas?.inchaco } })} color="blue" />
-                <SintomaBotao label="Humor" icon={<Smile size={14}/>} active={reg.sintomas?.humorInstavel} onClick={() => onUpdate(dia, { sintomas: { ...reg.sintomas, humorInstavel: !reg.sintomas?.humorInstavel } })} color="green" />
+             
+             <div className="grid grid-cols-2 gap-3">
+                <SintomaBotao label="Cólica" icon={<Thermometer size={16}/>} active={reg.sintomas.colica} onClick={() => onUpdate(dia, { sintomas: { ...reg.sintomas, colica: !reg.sintomas.colica } })} color="amber" />
+                <SintomaBotao label="Cabeça" icon={<Brain size={16}/>} active={reg.sintomas.dorDeCabeca} onClick={() => onUpdate(dia, { sintomas: { ...reg.sintomas, dorDeCabeca: !reg.sintomas.dorDeCabeca } })} color="purple" />
+                <SintomaBotao label="Inchaço" icon={<Wind size={16}/>} active={reg.sintomas.inchaco} onClick={() => onUpdate(dia, { sintomas: { ...reg.sintomas, inchaco: !reg.sintomas.inchaco } })} color="blue" />
+                <SintomaBotao label="Humor" icon={<Smile size={16}/>} active={reg.sintomas.humorInstavel} onClick={() => onUpdate(dia, { sintomas: { ...reg.sintomas, humorInstavel: !reg.sintomas.humorInstavel } })} color="green" />
              </div>
-             <textarea placeholder="Notas..." value={reg.notas || ""} onChange={(e) => onUpdate(dia, { notas: e.target.value })} className="w-full p-4 bg-gray-50 rounded-2xl text-xs min-h-[80px] outline-none" />
+             
+             <textarea 
+               placeholder="Notas sobre o dia..." 
+               value={reg.notas} 
+               onChange={(e) => onUpdate(dia, { notas: e.target.value })} 
+               className="w-full p-5 bg-gray-50 rounded-[2rem] text-sm min-h-[100px] outline-none border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all" 
+             />
           </div>
         </motion.div>
       </div>
@@ -261,13 +293,17 @@ function ModalSintomas({ dia, registros, onClose, onUpdate }: ModalSintomasProps
 
 function SintomaBotao({ label, icon, active, onClick, color }: SintomaBotaoProps) {
   const colors = {
-    amber: active ? "border-amber-400 bg-amber-50 text-amber-700" : "border-gray-100 text-gray-400",
-    purple: active ? "border-purple-400 bg-purple-50 text-purple-700" : "border-gray-100 text-gray-400",
-    blue: active ? "border-blue-400 bg-blue-50 text-blue-700" : "border-gray-100 text-gray-400",
-    green: active ? "border-green-400 bg-green-50 text-green-700" : "border-gray-100 text-gray-400",
+    amber: active ? "border-amber-400 bg-amber-50 text-amber-700 shadow-sm" : "border-gray-50 bg-gray-50 text-gray-400",
+    purple: active ? "border-purple-400 bg-purple-50 text-purple-700 shadow-sm" : "border-gray-50 bg-gray-50 text-gray-400",
+    blue: active ? "border-blue-400 bg-blue-50 text-blue-700 shadow-sm" : "border-gray-50 bg-gray-50 text-gray-400",
+    green: active ? "border-green-400 bg-green-50 text-green-700 shadow-sm" : "border-gray-50 bg-gray-50 text-gray-400",
   };
+  
   return (
-    <button onClick={onClick} className={`p-3 rounded-xl border-2 flex items-center gap-2 text-[10px] font-black uppercase transition-all ${colors[color]}`}>
+    <button 
+      onClick={onClick} 
+      className={`p-4 rounded-2xl border-2 flex items-center justify-center gap-2 text-[10px] font-black uppercase transition-all active:scale-95 ${colors[color]}`}
+    >
       {icon} {label}
     </button>
   );
