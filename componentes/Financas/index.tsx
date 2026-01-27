@@ -179,6 +179,8 @@ export default function Financas() {
                   </tbody>
                 </table>
               </div>
+
+              
             </div>
 
             {/* GRÁFICO DE GASTOS */}
@@ -205,6 +207,8 @@ export default function Financas() {
         )}
 
         {active === "calculadora" && (
+
+          
           <Card className="max-w-md mx-auto border-2 border-pink-100 rounded-[2.5rem] overflow-hidden shadow-xl shadow-pink-100/20">
             <div className="bg-pink-500 p-8 text-white text-right">
               <div className="text-pink-200 text-xs h-4 mb-1">{calcInput || "0"}</div>
