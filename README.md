@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌸 PinkLife
 
-## Getting Started
+PinkLife é um **app de organização e produtividade feito especialmente para mulheres**, com foco em rotina, bem-estar e equilíbrio entre vida pessoal, estudos, saúde e autocuidado.
 
-First, run the development server:
+A proposta é transformar a organização diária em algo **leve, bonito e motivador**, fugindo da estética fria de ferramentas tradicionais de produtividade.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 💖 Propósito do Projeto
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+O PinkLife foi criado para ajudar mulheres a:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Organizar a rotina diária de forma visual e intuitiva  
+- Acompanhar hábitos, estudos, treinos e saúde  
+- Ter uma visão clara da semana sem sobrecarga mental  
+- Sentir prazer em planejar o dia, não obrigação  
 
-## Learn More
+Tudo isso em um ambiente **delicado, acolhedor e funcional**.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🧠 Funcionalidades Principais
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 📊 Painel Geral
+- Visão rápida da sua rotina
+- Cards de **Saúde**, **Estudos**, **Treino** e **Pendências**
+- Frase motivacional personalizada
 
-## Deploy on Vercel
+### 📅 Agenda
+- Organização de compromissos diários
+- Visual simples e direto
+- Fácil de adicionar novos eventos
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### ⭐ Conquistas da Semana
+- Acompanhamento de metas semanais
+- Feedback visual do progresso
+- Incentivo à constância, não à perfeição
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 🧘‍♀️ Organização Completa
+O app conta com seções dedicadas a:
+- Estudos  
+- Treino  
+- Hábitos  
+- Finanças  
+- Beleza  
+- Alimentação  
+- Casa & Rotina  
+- Viagens  
+- Saúde  
+
+Tudo separado para evitar bagunça mental ✨
+
+---
+
+## 🎀 Interface
+
+A interface foi pensada para ser:
+- Feminina  
+- Minimalista  
+- Confortável visualmente  
+- Responsiva  
+
+### 🖥️ Tela Inicial (Dashboard)
+
+![Dashboard do PinkLife](./public/dashboard.png)
+
+> 📌 *Substitua essa imagem pelo print real do projeto colocando o arquivo na pasta `/public`.*
+
+---
+
+## 🌷 Público-Alvo
+
+- Mulheres que desejam mais organização sem pressão  
+- Estudantes  
+- Criadoras de conteúdo  
+- Mulheres que gostam de planners, rotina e autocuidado  
+- Pessoas que se sentem mais motivadas por interfaces visuais bonitas  
+
+---
+
+## 🚀 Objetivo Futuro
+
+Algumas ideias para evolução do PinkLife:
+- Login e perfil personalizado  
+- Sistema de metas mensais  
+- Modo dark (rosa escuro 🌙)  
+- Relatórios semanais  
+- Integração com calendário  
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+Este projeto foi desenvolvido com tecnologias modernas do ecossistema React:
+
+- Next.js  
+- React  
+- TypeScript  
+- Tailwind CSS  
+- Radix UI  
+- Framer Motion  
+
+---
+
+## 💕 Considerações Finais
+
+PinkLife não é apenas um app de produtividade.  
+É um espaço seguro para **se organizar com carinho**, respeitando seus limites e celebrando pequenas conquistas.
+
+> *“Você pode fazer qualquer coisa que quiser!”* 🌸
+
+---
+
+Feito com 💖 por **Olá Kitty**
