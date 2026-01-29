@@ -62,9 +62,9 @@ A interface foi pensada para ser:
 
 ### 🖥️ Tela Inicial (Dashboard)
 
-![Dashboard do PinkLife](./public/dashboard.png)
 
-> 📌 *Substitua essa imagem pelo print real do projeto colocando o arquivo na pasta `/public`.*
+![5174870932789595160](https://github.com/user-attachments/assets/f16951a2-2a72-4f4a-890a-9b5e3bb3fc4d)
+![5174870932789595161](https://github.com/user-attachments/assets/f01c9ba9-916c-485c-8e24-e468c910d4d6)
 
 ---
 
