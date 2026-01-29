@@ -62,7 +62,7 @@ A interface foi pensada para ser:
 
 ### 🖥️ Tela Inicial (Dashboard)
 
-<img src="https://github.com/user-attachments/assets/f16951a2-2a72-4f4a-890a-9b5e3bb3fc4d" width="400"/>
+<img src="https://github.com/user-attachments/assets/f16951a2-2a72-4f4a-890a-9b5e3bb3fc4d" width="200"/>
 
 <img src="https://github.com/user-attachments/assets/f01c9ba9-916c-485c-8e24-e468c910d4d6" width="400"/>
 
