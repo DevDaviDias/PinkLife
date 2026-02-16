@@ -6,6 +6,7 @@ import {
   House,
   Sparkles,
   Settings,
+  BookAIcon,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -23,9 +24,7 @@ export default function MenuMobile({ onChangeSessao }: MenuMobileProps) {
     { id: "financas",  icon: DollarSign },
     { id: "saude", icon: Heart },
     { id: "beleza", icon: Sparkles  },
-    
-    
-   
+    { id: "diario", icon: BookAIcon},
     { id: "Configuracao",  icon: Settings},
   ];
 

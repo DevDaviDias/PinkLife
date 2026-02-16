@@ -1,68 +1,55 @@
 import axios from "axios";
 
+// Pega a URL da API (Render ou Local)
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Auxiliar para pegar o token
-const getAuthHeaders = () => {
-  const token = localStorage.getItem("token");
-  return {
-    Authorization: `Bearer ${token}`,
-  };
-};
+const api = axios.create({
+  baseURL: API_URL,
+});
 
-// --- AUTENTICAÇÃO ---
+// Interceptor inteligente: só roda no navegador para evitar erros de build
+api.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
+
+// --- AUTENTICAÇÃO & USUÁRIO ---
 
 export async function loginUser(email: string, password: string) {
-  const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+  const response = await api.post("/auth/login", { email, password });
   return response.data;
 }
 
 export async function registerUser(name: string, email: string, password: string, confirmpassword: string) {
-  const response = await axios.post(`${API_URL}/auth/register`, {
-    name,
-    email,
-    password,
-    confirmpassword
-  });
+  const response = await api.post("/auth/register", { name, email, password, confirmpassword });
   return response.data;
 }
 
+// ESSA FUNÇÃO É ESSENCIAL PARA O DEBUG PANEL
 export async function getLoggedUser() {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("Usuário não está logado");
-
-  const response = await axios.get(`${API_URL}/user/me`, {
-    headers: getAuthHeaders(),
-  });
+  const response = await api.get("/user/me"); 
   return response.data;
 }
 
-// --- FUNÇÕES DO DIÁRIO (ADICIONADAS) ---
+// --- FUNÇÕES DO DIÁRIO ---
 
-// 1. Buscar todas as entradas do diário
 export async function getDiario() {
-  const response = await axios.get(`${API_URL}/diario`, {
-    headers: getAuthHeaders(),
-  });
-  return response.data; // Retorna o array de entradas
+  const response = await api.get("/diario");
+  return response.data;
 }
 
-// 2. Salvar nova entrada (Upload de Foto + Dados)
-// Nota: O parâmetro 'formData' deve conter 'foto', 'texto', 'humor' e 'destaque'
 export async function saveDiarioEntry(formData: FormData) {
-  const response = await axios.post(`${API_URL}/diario/upload`, formData, {
-    headers: {
-      ...getAuthHeaders(),
-      "Content-Type": "multipart/form-data",
-    },
-  });
-  return response.data; // Retorna a nova entrada criada
+  // O Axios configura o boundary do multipart automaticamente
+  const response = await api.post("/diario/upload", formData);
+  return response.data;
 }
 
-// 3. Excluir uma entrada do diário
 export async function deleteDiarioEntry(id: string) {
-  const response = await axios.delete(`${API_URL}/diario/${id}`, {
-    headers: getAuthHeaders(),
-  });
+  const response = await api.delete(`/diario/${id}`);
   return response.data;
 }

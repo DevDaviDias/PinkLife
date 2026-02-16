@@ -13,6 +13,7 @@ import {
   Target,
   Utensils,
   Settings,
+  BookAIcon,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -67,7 +68,7 @@ export default function MenuHamburguer({
     { id: "habitos", label: "Hábitos", icon: <Target size={18} /> },
     { id: "financas", label: "Finanças", icon: <DollarSign size={18} /> },
     { id: "beleza", label: "Beleza", icon: <Sparkles size={18} /> },
-    { id: "diario", label: "Diário", icon: <Plane size={18} /> },
+    { id: "diario", label: "Diário", icon: <BookAIcon size={18} /> },
     { id: "casa_rotina", label: "Casa & Rotina", icon: <House size={18} /> },
     { id: "saude", label: "Saúde", icon: <Heart size={18} /> },
     { id: "alimentacao", label: "Alimentação", icon: <Utensils size={18} /> },
