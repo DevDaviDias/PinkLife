@@ -20,7 +20,7 @@ Diferente das ferramentas tradicionais que possuem uma estética "fria", o PinkL
 
 O projeto utiliza uma estrutura de pastas separadas para facilitar a manutenção:
 
-```text
+
 pinklife/
  ├── web/     # Frontend em Next.js
  └── mobile/  # App em React Native / Expo
@@ -53,48 +53,5 @@ Tailwind CSS | Radix UI | Framer Motion
 📱 Mobile
 React Native | Expo | TypeScript
 
-🚀 Como rodar o projeto localmente
-1. Clone o repositório
-Bash
-git clone [https://github.com/seu-usuario/pinklife.git](https://github.com/seu-usuario/pinklife.git)
-cd pinklife
-2. Executando a Versão Web
-Bash
-cd web
-npm install
-npm run dev
-Acesse: http://localhost:3000
+## Como rodar o projeto localmente
 
-3. Executando a Versão Mobile
-Bash
-cd mobile
-npm install
-npx expo start
-Escaneie o QR Code no seu celular com o app Expo Go.
-
-🌷 Público-Alvo
-Estudantes e Criadoras de Conteúdo.
-
-Mulheres que amam planners e organização visual.
-
-Pessoas que buscam produtividade com foco em saúde mental.
-
-🚀 Objetivos Futuros
-[ ] Login e perfil personalizado (Firebase/Supabase)
-
-[ ] Modo Dark (estética Dark Pink 🌙)
-
-[ ] Relatórios automáticos de evolução semanal
-
-[ ] Sincronização em tempo real entre Web e Mobile
-
-💕 Considerações Finais
-"O PinkLife não é apenas um app. É um espaço para se organizar com carinho, respeitando seus limites e celebrando pequenas conquistas."
-
-“Você pode fazer qualquer coisa que quiser!” 🌸
-
-Feito com 💖 por DaviDias
-
-**Dica:** No trecho `git clone https://github.com/seu-usuario/pinklife.git`, lembre-se de trocar o `seu-usuario` pelo seu nome de usuário real do GitHub!
-
-Precisa de ajuda com mais alguma coisa na organização do seu perfil? 🌸
