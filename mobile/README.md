@@ -1,50 +1,54 @@
-# Welcome to your Expo app 👋
+# 📱 PinkLife Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Esta é a **versão mobile do PinkLife**, desenvolvida com **React Native + Expo**, focada em levar a experiência de organização e produtividade para o celular, com uma interface delicada, leve e motivadora.
 
-## Get started
+O objetivo é permitir que a usuária organize sua rotina em qualquer lugar, de forma simples e acolhedora.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## 💖 Sobre o PinkLife Mobile
 
-2. Start the app
+O PinkLife Mobile faz parte do monorepo do projeto **PinkLife**, que possui duas versões:
 
-   ```bash
-   npx expo start
-   ```
+- 🌐 Web (Next.js)  
+- 📱 Mobile (React Native / Expo)
 
-In the output, you'll find options to open the app in a
+A versão mobile é pensada para uso diário, rápido e prático, com foco em:
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- Registro de hábitos  
+- Acompanhamento de metas  
+- Organização da rotina  
+- Bem-estar e autocuidado  
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 🧠 Funcionalidades (em desenvolvimento)
 
-When you're ready, run:
+- 📊 Dashboard com visão geral da rotina  
+- 📅 Agenda diária  
+- ⭐ Conquistas semanais  
+- 🧘‍♀️ Seções de organização:
+  - Estudos  
+  - Treino  
+  - Hábitos  
+  - Finanças  
+  - Beleza  
+  - Alimentação  
+  - Casa & Rotina  
+  - Viagens  
+  - Saúde  
+
+> ⚠️ Algumas funcionalidades ainda estão em construção.
+
+---
+
+## 🗂️ Estrutura da Pasta
 
 ```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+mobile/
+ ├── app/
+ ├── assets/
+ ├── components/
+ ├── services/
+ ├── styles/
+ └── ...
