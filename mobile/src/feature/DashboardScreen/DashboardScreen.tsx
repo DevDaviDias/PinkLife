@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, StyleSheet, ImageBackground, Dimensions } from "react-native";
+import { View, ScrollView, StyleSheet } from "react-native";
 import { BookOpen, Heart, Repeat, Target } from "lucide-react-native";
 import DateComponent from "../../Components/ui/date";
 import Cardprogresso from "../../Components/ui/Cardprogresso";
@@ -10,11 +10,13 @@ import Cabecalho from "../../Components/ui/Cabecalho";
 import ContainerPages from "../../Components/ui/ContainerPages";
 import { useUser } from "../../../src/Context/UserContext";
 
-interface Materia { 
-  id: string; 
-  nome: string; 
-  metaHoras: number; 
-  horasEstudadas: number; 
+const DashboardImg = require("../../../assets/images/hello-kitty-dashboard.jpg");
+
+interface Materia {
+  id: string;
+  nome: string;
+  metaHoras: number;
+  horasEstudadas: number;
 }
 
 interface Tarefa {
@@ -34,14 +36,15 @@ export default function Dashboard() {
   const { user, refreshUser } = useUser();
   const userName = user?.name || "Visitante";
 
-  // Saudação dinâmica
-  const [saudacao, setSaudacao] = useState("");
+  const [periodo, setPeriodo] = useState("");
+  const [mensagem, setMensagem] = useState("");
+
   useEffect(() => {
     const hora = new Date().getHours();
-    let periodo = "";
-    if (hora >= 5 && hora < 12) periodo = "Bom dia";
-    else if (hora >= 12 && hora < 18) periodo = "Boa tarde";
-    else periodo = "Boa noite";
+    let saudacao = "";
+    if (hora >= 5 && hora < 12) saudacao = "Bom dia,";
+    else if (hora >= 12 && hora < 18) saudacao = "Boa tarde,";
+    else saudacao = "Boa noite,";
 
     const mimos = [
       "Pronta para brilhar?",
@@ -49,24 +52,24 @@ export default function Dashboard() {
       "Vamos conquistar o mundo?",
       "Foco e muita luz!",
       "Você é incrível!",
-      "Dia de realizar sonhos!"
+      "Dia de realizar sonhos!",
     ];
     const mimosHomem = [
       "Bora pra cima!",
       "Foco na missão!",
       "Dia de produtividade!",
       "Pronto para o progresso?",
-      "Mantenha a disciplina!"
+      "Mantenha a disciplina!",
     ];
-    const isFeminino = true; // pode vir do user.genero
+    const isFeminino = true;
     const mimoselect = isFeminino
       ? mimos[Math.floor(Math.random() * mimos.length)]
       : mimosHomem[Math.floor(Math.random() * mimosHomem.length)];
 
-    setSaudacao(`${periodo}, ${userName}! ${mimoselect}`);
+    setPeriodo(saudacao);
+    setMensagem(mimoselect);
   }, [userName]);
 
-  // States dos cards
   const [estudosStats, setEstudosStats] = useState({ horasLabel: "0.0h / 0h", porcentagem: 0 });
   const [treinoStats, setTreinoStats] = useState({ label: "Nenhum treino", porcentagem: 0, totalFichas: 0 });
   const [habitosStats, setHabitosStats] = useState({ label: "Sem registros", porcentagem: 0 });
@@ -78,7 +81,6 @@ export default function Dashboard() {
     if (!user?.progress) return;
     const { progress } = user;
 
-    // Estudos
     const materias = (progress.materias as Materia[]) || [];
     const tHoras = materias.reduce((acc, m) => acc + (Number(m.horasEstudadas) || 0), 0);
     const tMeta = materias.reduce((acc, m) => acc + (Number(m.metaHoras) || 0), 0);
@@ -87,7 +89,6 @@ export default function Dashboard() {
       porcentagem: tMeta > 0 ? Math.min((tHoras / tMeta) * 100, 100) : 0,
     });
 
-    // Treinos
     const treinos = (progress.treinos as Treino[]) || [];
     setTreinoStats({
       label: treinos.length > 0 ? `${treinos.length} treinos` : "Nenhum treino",
@@ -95,42 +96,71 @@ export default function Dashboard() {
       totalFichas: treinos.length,
     });
 
-    // Saúde
     const totalSaude = progress.saude ? Object.keys(progress.saude).length : 0;
     setHabitosStats({
       label: totalSaude > 0 ? `${totalSaude} registros` : "Sem registros",
       porcentagem: totalSaude > 0 ? 100 : 0,
     });
 
-    // Tarefas
     const tarefas = (progress.tarefas as Tarefa[]) || [];
-    const concluidasT = tarefas.filter(t => t.concluida).length;
+    const concluidasT = tarefas.filter((t) => t.concluida).length;
     const totalT = tarefas.length;
     setTarefasStats({
-      label: totalT - concluidasT > 0 ? `${totalT - concluidasT} pendentes` : totalT > 0 ? "Tudo feito! ✨" : "Sem tarefas",
+      label:
+        totalT - concluidasT > 0
+          ? `${totalT - concluidasT} pendentes`
+          : totalT > 0
+            ? "Tudo feito! ✨"
+            : "Sem tarefas",
       porcentagem: totalT > 0 ? (concluidasT / totalT) * 100 : 0,
     });
   }, [user]);
 
   return (
     <ContainerPages>
-      {/* Cabeçalho com imagem */}
-      <Cabecalho title={saudacao} imageSrc={"/images/hello-kitty-dashboard.jpg"}>
-        <DateComponent />
-      </Cabecalho>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Cabeçalho com nome destacado */}
+        <Cabecalho
+          greeting={periodo}
+          userName={`${userName}!`}
+          subtitle={mensagem}
+          imageSrc={DashboardImg}
+        >
+          <DateComponent />
+        </Cabecalho>
 
-      <ScrollView contentContainerStyle={styles.container}>
         {/* Grid de cards */}
         <View style={styles.cardGrid}>
-          <Cardprogresso title="Saúde" progressoDodia={habitosStats.label} progresso={habitosStats.porcentagem} barraDeProgresso icon={<Target size={20} />} />
-          <Cardprogresso title="Tarefas" progressoDodia={tarefasStats.label} progresso={tarefasStats.porcentagem} barraDeProgresso icon={<Repeat size={20} />} />
-          <Cardprogresso title="Estudos" progressoDodia={estudosStats.horasLabel} progresso={estudosStats.porcentagem} barraDeProgresso icon={<BookOpen size={20} />} />
-          <Cardprogresso 
-            title="Treino" 
-            progressoDodia={treinoStats.label} 
-            progresso={treinoStats.porcentagem} 
-            barraDeProgresso 
-            icon={<Heart size={20} color={treinoStats.totalFichas > 0 ? "#EC4899" : "#A1A1AA"} />} 
+          <Cardprogresso
+            title="Saúde"
+            progressoDodia={habitosStats.label}
+            progresso={habitosStats.porcentagem}
+            barraDeProgresso
+            icon={<Target size={20} color="#ec4899" />}
+          />
+          <Cardprogresso
+            title="Tarefas"
+            progressoDodia={tarefasStats.label}
+            progresso={tarefasStats.porcentagem}
+            barraDeProgresso
+            icon={<Repeat size={20} color="#ec4899" />}
+          />
+          <Cardprogresso
+            title="Estudos"
+            progressoDodia={estudosStats.horasLabel}
+            progresso={estudosStats.porcentagem}
+            barraDeProgresso
+            icon={<BookOpen size={20} color="#ec4899" />}
+          />
+          <Cardprogresso
+            title="Treinos"
+            progressoDodia={treinoStats.label}
+            progresso={treinoStats.porcentagem}
+            barraDeProgresso
+            icon={<Heart size={20} color={treinoStats.totalFichas > 0 ? "#ec4899" : "#f9a8d4"} />}
           />
         </View>
 
@@ -143,6 +173,7 @@ export default function Dashboard() {
             <Conquistas />
           </View>
         </View>
+
       </ScrollView>
     </ContainerPages>
   );
@@ -150,19 +181,18 @@ export default function Dashboard() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    paddingBottom: 32,
+    paddingBottom: 100,
   },
   cardGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    marginVertical: 12,
+    marginVertical: 1,
+    paddingHorizontal: 16,
   },
   bottomSection: {
     flexDirection: "column",
-    gap: 12,
-    marginTop: 16,
+    paddingHorizontal: 16,
   },
   agendaWrapper: { flex: 1 },
   conquistasWrapper: { marginTop: 12 },
