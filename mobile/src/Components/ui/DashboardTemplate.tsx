@@ -7,7 +7,6 @@ import TreinoScreen from "@/src/feature/TreinoScreen/TreinoScreen";
 // Quando criar as outras telas, importe e adicione aqui:
 // import AgendaScreen from "@/src/feature/Agenda/AgendaScreen";
 import EstudosScreen from "@/src/feature/EstudosScreen/EstudosScreen";
-
 import SaudeScreen from "@/src/feature/SaudeScreen/SaudeScreen";
 // import BelezaScreen from "@/src/feature/Beleza/BelezaScreen";
 import DiarioScreen from "@/src/feature/DiarioScreen/DiarioScreen";
