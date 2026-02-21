@@ -1,7 +1,7 @@
 import { useState } from "react";
 import LoginScreen from "./LoginScreen";
 import RegisterScreen from "./RegisterScreen";
-import DashboardScreen from "../../DashboardScreen/DashboardScreen";
+import DashboardTemplate from "@/src/Components/ui/DashboardTemplate";
 import { useUser } from "@/src/Context/UserContext";
 
 export default function AuthFlow() {
@@ -9,7 +9,7 @@ export default function AuthFlow() {
   const [screen, setScreen] = useState<"login" | "register">("login");
 
   if (user) {
-    return <DashboardScreen />;
+    return <DashboardTemplate />;
   }
 
   if (screen === "register") {

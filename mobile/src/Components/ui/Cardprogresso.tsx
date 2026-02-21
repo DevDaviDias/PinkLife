@@ -6,7 +6,7 @@ type PropsProgresso = {
   title: string;
   porcentagem?: number | string;
   progressoDodia?: string;
-  progresso?: number; // número de 0 a 100
+  progresso?: number;
   barraDeProgresso?: boolean;
   valor?: string | number;
   cor?: string;
@@ -22,26 +22,29 @@ export default function CardProgresso({
   valor,
   cor = "#ec4899",
 }: PropsProgresso) {
-  // Garantindo que progresso seja número entre 0 e 100
   const progressoNumber = Math.min(Math.max(Number(progresso), 0), 100);
 
   return (
     <View style={styles.card}>
       {/* Header */}
       <View style={styles.header}>
-        {icon && <View style={{ marginRight: 8 }}>{icon}</View>}
+        <View style={[styles.iconWrapper, { backgroundColor: cor + "20" }]}>
+          {icon}
+        </View>
         <Text style={[styles.title, { color: cor }]}>{title}</Text>
       </View>
 
       {/* Porcentagem e valor */}
-      <View style={{ marginTop: 8 }}>
-        {porcentagem !== undefined && (
-          <Text style={{ fontWeight: "bold", color: cor }}>{porcentagem}</Text>
-        )}
-        {valor !== undefined && (
-          <Text style={{ fontWeight: "bold", color: cor }}>{valor}</Text>
-        )}
-      </View>
+      {(porcentagem !== undefined || valor !== undefined) && (
+        <View style={{ marginTop: 8 }}>
+          {porcentagem !== undefined && (
+            <Text style={{ fontWeight: "bold", color: cor }}>{porcentagem}</Text>
+          )}
+          {valor !== undefined && (
+            <Text style={{ fontWeight: "bold", color: cor }}>{valor}</Text>
+          )}
+        </View>
+      )}
 
       {/* Progresso do dia */}
       {progressoDodia && (
@@ -55,15 +58,9 @@ export default function CardProgresso({
             style={[
               styles.progressBarFill,
               {
-                flex: progressoNumber / 100, // usa flex para preencher proporcional
+                width: `${progressoNumber}%`,
                 backgroundColor: cor,
               },
-            ]}
-          />
-          <View
-            style={[
-              styles.progressBarEmpty,
-              { flex: 1 - progressoNumber / 100 },
             ]}
           />
         </View>
@@ -74,41 +71,50 @@ export default function CardProgresso({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "white",
-    padding: 16,
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    backgroundColor: "#fff",
+    padding: 14,
+    borderRadius: 20,
+    marginVertical: 6,
+    width: "48%",
+    borderWidth: 1.5,
+    borderColor: "#fce7f3",
+    shadowColor: "#ec4899",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
     elevation: 3,
-    marginVertical: 8,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 8,
+  },
+  iconWrapper: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 15,
+    fontWeight: "800",
   },
   progressoText: {
-    fontSize: 14,
-    marginTop: 4,
+    fontSize: 13,
+    marginTop: 6,
+    color: "#9ca3af",
+    fontWeight: "500",
   },
   progressBarBackground: {
-    flexDirection: "row", // necessário para flex
     height: 6,
     borderRadius: 3,
     overflow: "hidden",
-    marginTop: 8,
-    backgroundColor: "#e5e7eb",
+    marginTop: 10,
+    backgroundColor: "#fce7f3",
   },
   progressBarFill: {
     height: 6,
     borderRadius: 3,
-  },
-  progressBarEmpty: {
-    height: 6,
-    backgroundColor: "#e5e7eb",
   },
 });

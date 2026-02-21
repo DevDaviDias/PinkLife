@@ -10,14 +10,29 @@ export default function DateComponent() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.dateText}>
-        {weekday}, {day} de {month} de {year}
+      <Text style={styles.weekday}>🌸 {weekday}</Text>
+      <Text style={styles.date}>
+        {day} de {month.toLowerCase()} de {year}
       </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { marginVertical: 8 },
-  dateText: { fontSize: 16, fontWeight: "bold", color: "#ec4899" },
+  container: {
+    marginTop: 6,
+  },
+  weekday: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#ec4899",
+    textTransform: "capitalize",
+    letterSpacing: 0.5,
+  },
+  date: {
+    fontSize: 11,
+    color: "#f9a8d4",
+    fontWeight: "500",
+    marginTop: 1,
+  },
 });
