@@ -25,16 +25,16 @@ type MenuMobileProps = {
 };
 
 const menuItems = [
-  { id: "dashboard", icon: House, label: "Início" },
-  { id: "agenda", icon: CalendarDays, label: "Agenda" },
+  
   { id: "estudos", icon: BookOpen, label: "Estudos" },
-  { id: "treino", icon: Dumbbell, label: "Treino" },
+  { id: "treinos", icon: Dumbbell, label: "Treino" },
+  { id: "dashboard", icon: House, label: "Início" },
   { id: "financas", icon: DollarSign, label: "Finanças" },
   { id: "saude", icon: Heart, label: "Saúde" },
-  { id: "beleza", icon: Sparkles, label: "Beleza" },
-  { id: "diario", icon: BookMarked, label: "Diário" },
+ // { id: "beleza", icon: Sparkles, label: "Beleza" },
+  //{ id: "diario", icon: BookMarked, label: "Diário" },
   { id: "perfil", icon: User, label: "Perfil" },
-  { id: "configuracao", icon: Settings, label: "Config" },
+  //{ id: "configuracao", icon: Settings, label: "Config" },
 ];
 
 function MenuItem({
