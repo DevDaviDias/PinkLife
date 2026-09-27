@@ -1,24 +1,27 @@
 interface GrayMenuProps {
-    items:{
+  items: {
     title: string;
     onClick?: () => void;
-    active?: boolean;}[];
+    active?: boolean;
+  }[];
 }
 
 export default function GrayMenu({ items }: GrayMenuProps) {
-    return (
-        <>
-       <div className ="mt-4 flex gap-2 w-full bg-gray-100 p-1 rounded-lg ">
-        {items.map((item, index) => (
-            <button
-                key={index}
-                onClick={item.onClick}
-                className={`px-3 py-1 rounded-[0.2em] w-full text-[0.9em] font-medium ${item.active ? 'bg-gray-100 text-gray-900' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`}
-            >
-                {item.title}
-                </button>
-        ))}
-        </div>
-        </>
-    );
+  return (
+    <div className="mt-4 flex w-full gap-2 rounded-2xl border border-pink-100 bg-pink-50 p-1.5">
+      {items.map((item, index) => (
+        <button
+          key={index}
+          onClick={item.onClick}
+          className={`w-full rounded-xl px-3 py-1.5 text-[0.9em] font-semibold transition-all ${
+            item.active
+              ? "bg-pink-500 text-white shadow-sm shadow-pink-200"
+              : "bg-transparent text-pink-400 hover:bg-white hover:text-pink-500"
+          }`}
+        >
+          {item.title}
+        </button>
+      ))}
+    </div>
+  );
 }

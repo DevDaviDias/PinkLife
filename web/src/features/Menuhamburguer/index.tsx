@@ -84,7 +84,7 @@ export default function MenuHamburguer({
         p-4
         bg-white
         h-screen
-        border-r border-pink-300
+        border-r border-pink-100
         fixed left-0 top-0
         z-50
       "
@@ -117,8 +117,8 @@ export default function MenuHamburguer({
                 icon={icon}
                 className={
                   activeSessao === id
-                    ? "bg-pink-400 text-white shadow-md shadow-pink-100"
-                    : "bg-white text-gray-700 hover:bg-pink-50 hover:text-pink-500 border-transparent transition-all"
+                    ? "bg-pink-500 text-white shadow-md shadow-pink-200 font-semibold"
+                    : "bg-white text-gray-600 hover:bg-pink-50 hover:text-pink-500 border-transparent transition-all"
                 }
               />
             </li>

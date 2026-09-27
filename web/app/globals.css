@@ -17,19 +17,27 @@
 }
 
 :root[data-theme='light'] {
-  /* 🌸 TEMA ROSA (Light) */
-  --gray-900: #f4e6eb; /* Fundo principal rosa claro */
+  /* 🌸 TEMA ROSA (Light) — paleta espelhada da versão mobile */
+  --gray-900: #fdf2f8; /* Fundo principal rosa clarinho (igual ao app mobile) */
   --gray-800: #ffffff; /* Cards brancos */
   --gray-700: #fff6fa; /* Hover rosa gelo */
-  --gray-500: #ffb6d1; /* Bordas rosas */
+  --gray-500: #fce7f3; /* Bordas rosas suaves */
 
-  --primary: #ff5fa2;         /* Rosa principal */
-  --primary-hover: #ff3f92;
-  --accent: #9b4dff;          /* Roxo como detalhe */
+  --primary: #ec4899;         /* Rosa principal (pink-500, igual ao mobile) */
+  --primary-hover: #db2777;
+  --primary-dark: #be185d;    /* Rosa escuro usado nos títulos/nomes */
+  --primary-light: #f9a8d4;   /* Rosa clarinho usado em subtítulos */
+  --accent: #c084fc;          /* Roxo como detalhe (ícones inativos do menu) */
 
   --text-default: #3a3a3a;    /* Texto escuro */
   --text-muted: #6b6b6b;      /* Texto suave */
   --text-on-primary: #ffffff;
+
+  /* Bolhas decorativas de fundo (mesmas cores do app mobile) */
+  --bubble-1: #fce7f3;
+  --bubble-2: #fbcfe8;
+  --bubble-3: #f9a8d4;
+  --bubble-4: #fde68a;
 }
 
 @theme {
@@ -51,3 +59,10 @@ body {
   color: var(--text-default);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* Bolhas decorativas usadas pelo ContainerPages, replicando o fundo "fofo"
+   da versão mobile na versão web/PC. */
+.bg-bubble-1 { background-color: var(--bubble-1); }
+.bg-bubble-2 { background-color: var(--bubble-2); }
+.bg-bubble-3 { background-color: var(--bubble-3); }
+.bg-bubble-4 { background-color: var(--bubble-4); }

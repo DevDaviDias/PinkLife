@@ -9,7 +9,7 @@ export default function DashboardTemplate({ children }: { children: React.ReactN
       <MenuHamburguer onChangeSessao={(s) => console.log(s)} />
       <MenuMobile onChangeSessao={(s) => console.log(s)} />
 
-      <main className="lg:ml-[17em] pb-[5.5em] p-6">
+      <main className="lg:ml-[17em] pb-[6.5em] p-6 lg:pb-6">
         {children} 
       </main>
     </>
